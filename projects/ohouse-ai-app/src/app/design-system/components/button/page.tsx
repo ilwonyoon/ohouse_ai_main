@@ -40,6 +40,9 @@ export default function ButtonPage() {
   const [selectedVariant, setSelectedVariant] = useState<'primary' | 'secondary'>('primary');
   const [isButtonSelected, setIsButtonSelected] = useState(false);
 
+  // Override 대기 상태 - null인 값을 override하려고 할 때 경고 표시
+  const [pendingOverrideToken, setPendingOverrideToken] = useState<string | null>(null);
+
   // Primary 버튼 컬러 토큰
   const [primaryColors, setPrimaryColors] = useState({
     backgroundColor: '#000000',
@@ -474,6 +477,17 @@ export default function ButtonPage() {
     );
   };
 
+  // 주어진 토큰에 대해 override를 가진 버튼 목록 반환
+  const getExceptions = (tokenKey: string): string[] => {
+    const exceptions: string[] = [];
+    Object.entries(buttonOverrides).forEach(([buttonKey, overrideValues]) => {
+      if (overrideValues[tokenKey as keyof typeof overrideValues] !== null) {
+        exceptions.push(buttonKey);
+      }
+    });
+    return exceptions;
+  };
+
   return (
     <div css={pageContainerStyle}>
       {/* Main Content */}
@@ -818,6 +832,49 @@ export default function ButtonPage() {
                             </div>
                           </div>
                         </div>
+
+                        {/* Padding Exception 표시 */}
+                        {(() => {
+                          const paddingExceptions: { top: string[], right: string[], bottom: string[], left: string[] } = {
+                            top: getExceptions('paddingTop'),
+                            right: getExceptions('paddingRight'),
+                            bottom: getExceptions('paddingBottom'),
+                            left: getExceptions('paddingLeft'),
+                          };
+                          const allPaddingExceptions = [...new Set([...paddingExceptions.top, ...paddingExceptions.right, ...paddingExceptions.bottom, ...paddingExceptions.left])];
+
+                          if (allPaddingExceptions.length > 0) {
+                            return (
+                              <div style={{
+                                marginTop: '8px',
+                                padding: '6px 8px',
+                                backgroundColor: '#f0f8ff',
+                                border: '1px solid #b3d9ff',
+                                borderRadius: '4px',
+                                fontSize: '10px',
+                                color: '#0066cc',
+                                lineHeight: '1.4',
+                              }}>
+                                <span style={{ fontWeight: '600' }}>Exception: </span>
+                                {allPaddingExceptions.map((excBtn, idx) => {
+                                  const paddingValues: string[] = [];
+                                  if (paddingExceptions.top.includes(excBtn)) paddingValues.push(`T:${buttonOverrides[excBtn].paddingTop}`);
+                                  if (paddingExceptions.right.includes(excBtn)) paddingValues.push(`R:${buttonOverrides[excBtn].paddingRight}`);
+                                  if (paddingExceptions.bottom.includes(excBtn)) paddingValues.push(`B:${buttonOverrides[excBtn].paddingBottom}`);
+                                  if (paddingExceptions.left.includes(excBtn)) paddingValues.push(`L:${buttonOverrides[excBtn].paddingLeft}`);
+
+                                  return (
+                                    <span key={idx}>
+                                      {excBtn} <strong>({paddingValues.join(', ')})</strong>
+                                      {idx < allPaddingExceptions.length - 1 ? ', ' : ''}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
                     );
                   }
@@ -827,6 +884,8 @@ export default function ButtonPage() {
 
                 // 일반 토큰 필드
                 const config = tokenConfig[key];
+                const exceptions = getExceptions(key);
+
                 return (
                   <div key={key} css={tokenInputGroupStyle}>
                     <label>{key.replace(/([A-Z])/g, ' $1').trim()}</label>
@@ -847,6 +906,31 @@ export default function ButtonPage() {
                       />
                       {config.suffix && <span className="input-suffix">{config.suffix}</span>}
                     </div>
+
+                    {/* Exception 표시 */}
+                    {exceptions.length > 0 && (
+                      <div style={{
+                        marginTop: '6px',
+                        padding: '6px 8px',
+                        backgroundColor: '#f0f8ff',
+                        border: '1px solid #b3d9ff',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                        color: '#0066cc',
+                        lineHeight: '1.4',
+                      }}>
+                        <span style={{ fontWeight: '600' }}>Exception: </span>
+                        {exceptions.map((excBtn, idx) => {
+                          const overrideValue = buttonOverrides[excBtn][key as keyof typeof buttonOverrides[string]];
+                          return (
+                            <span key={idx}>
+                              {excBtn} <strong>{overrideValue}{config.suffix}</strong>
+                              {idx < exceptions.length - 1 ? ', ' : ''}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -910,6 +994,9 @@ export default function ButtonPage() {
                 </label>
                 {Object.entries(currentOverride).map(([key, value]) => {
                   const config = tokenConfig[key];
+                  const isInheriting = value === null;
+                  const sharedValue = sharedTokens[key as keyof typeof sharedTokens];
+
                   return (
                     <div key={key} css={tokenInputGroupStyle}>
                       <label>{key.replace(/([A-Z])/g, ' $1').trim()}</label>
@@ -917,6 +1004,7 @@ export default function ButtonPage() {
                         <input
                           type="number"
                           value={value ?? ''}
+                          disabled={isInheriting}
                           onChange={(e) => {
                             const newValue = e.target.value ? parseInt(e.target.value) : null;
 
@@ -927,6 +1015,9 @@ export default function ButtonPage() {
                               ...buttonOverrides,
                               [currentButtonKey]: updatedOverride,
                             });
+
+                            // 경고 메시지 숨김
+                            setPendingOverrideToken(null);
                           }}
                           onKeyDown={(e) => {
                             if (value !== null) {
@@ -936,12 +1027,87 @@ export default function ButtonPage() {
                           step={config.step}
                           min={config.min}
                           max={config.max}
-                          placeholder="Inherit"
+                          placeholder="Click Override"
                           className="with-suffix"
-                          style={{ color: value === null ? '#c2c8cc' : '#2f3438' }}
+                          style={{
+                            color: value === null ? '#c2c8cc' : '#2f3438',
+                            backgroundColor: value === null ? '#f0f0f0' : '#ffffff',
+                            cursor: value === null ? 'not-allowed' : 'text',
+                          }}
                         />
                         {config.suffix && <span className="input-suffix">{config.suffix}</span>}
                       </div>
+
+                      {/* 경고 메시지 - null 값일 때만 표시 */}
+                      {isInheriting && pendingOverrideToken === key && (
+                        <div style={{
+                          marginTop: '8px',
+                          padding: '8px 12px',
+                          backgroundColor: '#fffbf0',
+                          border: '1px solid #ffd700',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          color: '#8b6914',
+                        }}>
+                          <div style={{ marginBottom: '8px' }}>
+                            ⚠️ Changing this will modify the global setting ({sharedValue}{config.suffix})
+                          </div>
+                          <button
+                            onClick={() => {
+                              const updatedOverride = { ...currentOverride, [key]: sharedValue };
+                              setButtonOverrides({
+                                ...buttonOverrides,
+                                [currentButtonKey]: updatedOverride,
+                              });
+                              setPendingOverrideToken(null);
+                            }}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: '#0aa5ff',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s',
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0087cc'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0aa5ff'}
+                          >
+                            Override
+                          </button>
+                        </div>
+                      )}
+
+                      {/* 입력 필드 클릭 시 경고 표시 */}
+                      {isInheriting && pendingOverrideToken !== key && (
+                        <div
+                          onClick={() => setPendingOverrideToken(key)}
+                          style={{
+                            marginTop: '8px',
+                            padding: '8px 12px',
+                            backgroundColor: '#f5f5f5',
+                            border: '1px dashed #c2c8cc',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            color: '#828c94',
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            transition: 'all 0.2s',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#fffbf0';
+                            e.currentTarget.style.borderColor = '#ffd700';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#f5f5f5';
+                            e.currentTarget.style.borderColor = '#c2c8cc';
+                          }}
+                        >
+                          Click to override this token
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -1007,6 +1173,9 @@ export default function ButtonPage() {
                 </label>
                 {Object.entries(currentOverride).map(([key, value]) => {
                   const config = tokenConfig[key];
+                  const isInheriting = value === null;
+                  const sharedValue = sharedTokens[key as keyof typeof sharedTokens];
+
                   return (
                     <div key={key} css={tokenInputGroupStyle}>
                       <label>{key.replace(/([A-Z])/g, ' $1').trim()}</label>
@@ -1014,6 +1183,7 @@ export default function ButtonPage() {
                         <input
                           type="number"
                           value={value ?? ''}
+                          disabled={isInheriting}
                           onChange={(e) => {
                             const newValue = e.target.value ? parseInt(e.target.value) : null;
 
@@ -1024,6 +1194,9 @@ export default function ButtonPage() {
                               ...buttonOverrides,
                               [currentButtonKey]: updatedOverride,
                             });
+
+                            // 경고 메시지 숨김
+                            setPendingOverrideToken(null);
                           }}
                           onKeyDown={(e) => {
                             if (value !== null) {
@@ -1033,12 +1206,87 @@ export default function ButtonPage() {
                           step={config.step}
                           min={config.min}
                           max={config.max}
-                          placeholder="Inherit"
+                          placeholder="Click Override"
                           className="with-suffix"
-                          style={{ color: value === null ? '#c2c8cc' : '#2f3438' }}
+                          style={{
+                            color: value === null ? '#c2c8cc' : '#2f3438',
+                            backgroundColor: value === null ? '#f0f0f0' : '#ffffff',
+                            cursor: value === null ? 'not-allowed' : 'text',
+                          }}
                         />
                         {config.suffix && <span className="input-suffix">{config.suffix}</span>}
                       </div>
+
+                      {/* 경고 메시지 - null 값일 때만 표시 */}
+                      {isInheriting && pendingOverrideToken === key && (
+                        <div style={{
+                          marginTop: '8px',
+                          padding: '8px 12px',
+                          backgroundColor: '#fffbf0',
+                          border: '1px solid #ffd700',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          color: '#8b6914',
+                        }}>
+                          <div style={{ marginBottom: '8px' }}>
+                            ⚠️ Changing this will modify the global setting ({sharedValue}{config.suffix})
+                          </div>
+                          <button
+                            onClick={() => {
+                              const updatedOverride = { ...currentOverride, [key]: sharedValue };
+                              setButtonOverrides({
+                                ...buttonOverrides,
+                                [currentButtonKey]: updatedOverride,
+                              });
+                              setPendingOverrideToken(null);
+                            }}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: '#0aa5ff',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s',
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0087cc'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#0aa5ff'}
+                          >
+                            Override
+                          </button>
+                        </div>
+                      )}
+
+                      {/* 입력 필드 클릭 시 경고 표시 */}
+                      {isInheriting && pendingOverrideToken !== key && (
+                        <div
+                          onClick={() => setPendingOverrideToken(key)}
+                          style={{
+                            marginTop: '8px',
+                            padding: '8px 12px',
+                            backgroundColor: '#f5f5f5',
+                            border: '1px dashed #c2c8cc',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            color: '#828c94',
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            transition: 'all 0.2s',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#fffbf0';
+                            e.currentTarget.style.borderColor = '#ffd700';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#f5f5f5';
+                            e.currentTarget.style.borderColor = '#c2c8cc';
+                          }}
+                        >
+                          Click to override this token
+                        </div>
+                      )}
                     </div>
                   );
                 })}

@@ -106,7 +106,7 @@ export default function ButtonPage() {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
-    margin-top: 24px;
+    align-items: center;
   `;
 
   const basicButtonStyle = css`
@@ -243,9 +243,23 @@ export function MyComponent() {
   children: React.ReactNode;
 }`;
 
+  // 새로운 디버그 패널 스타일
+  const debugPanelStyle = css`
+    margin: 24px 0;
+    padding: 16px;
+    background-color: #f0f8ff;
+    border: 2px dashed #0aa5ff;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #2f3438;
+    max-height: 120px;
+    overflow-y: auto;
+  `;
+
   return (
     <div css={pageStyle}>
-      <h1 css={headingStyle}>Button</h1>
+      <h1 css={headingStyle}>Button Component</h1>
       <p css={descriptionStyle}>
         A versatile button component supporting multiple variants, sizes, and states.
         Use buttons for primary actions, secondary actions, and destructive operations.
@@ -262,6 +276,14 @@ export function MyComponent() {
             Disabled
           </button>
         </ComponentPreview>
+
+        {/* 실시간 업데이트 모니터링 */}
+        <div css={debugPanelStyle}>
+          <div><strong>🔄 현재 Primary Button 토큰:</strong></div>
+          <div>backgroundColor: {primaryTokens.backgroundColor}</div>
+          <div>textColor: {primaryTokens.textColor}</div>
+          <div>padding: {primaryTokens.padding}</div>
+        </div>
       </div>
 
       <div css={sectionStyle}>

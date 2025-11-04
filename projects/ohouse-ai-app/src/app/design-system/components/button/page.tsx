@@ -5,13 +5,26 @@ import { css } from '@emotion/react';
 import { CodeBlock } from '../CodeBlock';
 import { ComponentPreview } from '../ComponentPreview';
 
+// 토큰별 설정 (step, suffix, min, max)
+const tokenConfig: Record<string, { step: number; suffix: string; min: number; max: number }> = {
+  borderRadius: { step: 1, suffix: 'px', min: 0, max: 24 },
+  fontWeight: { step: 100, suffix: '', min: 100, max: 900 },
+  transitionDuration: { step: 50, suffix: 'ms', min: 0, max: 1000 },
+};
+
+const colorTokenConfig = {
+  step: 1,
+  suffix: '',
+  min: 0,
+  max: 255,
+};
+
 export default function ButtonPage() {
   // 모든 버튼이 공유하는 기본 토큰
   const [sharedTokens, setSharedTokens] = useState({
+    borderRadius: 8,
     fontWeight: 600,
-    fontFamily: 'Pretendard, -apple-system, BlinkMacSystemFont, sans-serif',
-    transitionDuration: '200ms',
-    borderRadius: '8px',
+    transitionDuration: 200,
   });
 
   // Primary 버튼 컬러 토큰
@@ -37,13 +50,27 @@ export default function ButtonPage() {
     disabledBorderColor: '#e6e6e6',
   });
 
+  // Primary override 토큰 (스타일 재정의용)
+  const [primaryOverride, setPrimaryOverride] = useState({
+    borderRadius: null as number | null,
+    fontWeight: null as number | null,
+    transitionDuration: null as number | null,
+  });
+
+  // Secondary override 토큰 (스타일 재정의용)
+  const [secondaryOverride, setSecondaryOverride] = useState({
+    borderRadius: null as number | null,
+    fontWeight: null as number | null,
+    transitionDuration: null as number | null,
+  });
+
   // 버튼 사이즈 정의
   const buttonSizes = [
-    { name: 'Small', height: '28px', padding: '6px 12px', fontSize: '12px' },
-    { name: 'Medium', height: '32px', padding: '8px 16px', fontSize: '13px' },
-    { name: 'Default', height: '40px', padding: '10px 20px', fontSize: '14px' },
-    { name: 'Large', height: '44px', padding: '12px 24px', fontSize: '15px' },
-    { name: 'Extra Large', height: '50px', padding: '14px 28px', fontSize: '16px' },
+    { name: 'Small', height: '28px', width: '72px', padding: '6px 12px', fontSize: '12px' },
+    { name: 'Medium', height: '32px', width: '84px', padding: '8px 16px', fontSize: '13px' },
+    { name: 'Default', height: '40px', width: '104px', padding: '10px 20px', fontSize: '14px' },
+    { name: 'Large', height: '44px', width: '116px', padding: '12px 24px', fontSize: '15px' },
+    { name: 'Extra Large', height: '50px', width: '140px', padding: '14px 28px', fontSize: '16px' },
   ];
 
   // 레이아웃 스타일
@@ -105,17 +132,44 @@ export default function ButtonPage() {
 
     input {
       width: 100%;
-      padding: 8px;
+      padding: 8px 8px 8px 8px;
       border-radius: 6px;
       border: 1px solid #e6e6e6;
       font-size: 13px;
       font-family: monospace;
+      background-color: #ffffff;
+      transition: all 0.2s ease;
+      position: relative;
 
       &:focus {
         outline: none;
         border-color: #0aa5ff;
         box-shadow: 0 0 0 3px rgba(10, 165, 255, 0.1);
       }
+
+      &::placeholder {
+        color: #c2c8cc;
+      }
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-suffix {
+      position: absolute;
+      right: 8px;
+      font-size: 12px;
+      color: #c2c8cc;
+      font-weight: 400;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      pointer-events: none;
+    }
+
+    input.with-suffix {
+      padding-right: 24px;
     }
   `;
 
@@ -125,7 +179,7 @@ export default function ButtonPage() {
     gap: 12px;
   `;
 
-  const sizeButtonStyle = css`
+  const sizeButtonContainerStyle = css`
     padding: 16px;
     background-color: #ffffff;
     border: 1px solid #e6e6e6;
@@ -139,10 +193,16 @@ export default function ButtonPage() {
       margin-bottom: 8px;
     }
 
+    .spec {
+      font-size: 11px;
+      color: #828c94;
+      margin-bottom: 8px;
+    }
+
     .buttons {
       display: flex;
       gap: 8px;
-      justify-content: center;
+      justify-content: flex-end;
     }
   `;
 
@@ -229,39 +289,66 @@ export default function ButtonPage() {
     }
   `;
 
-  // 버튼 스타일 생성 함수
+  // 버튼 스타일 생성 함수 - override 지원
   const createButtonStyle = (
     backgroundColor: string,
     textColor: string,
     hoverBackgroundColor: string,
     fontSize: string,
-    padding: string
-  ) => css`
-    padding: ${padding};
-    background-color: ${backgroundColor};
-    color: ${textColor};
-    border: none;
-    border-radius: ${sharedTokens.borderRadius};
-    font-size: ${fontSize};
-    font-weight: ${sharedTokens.fontWeight};
-    font-family: ${sharedTokens.fontFamily};
-    cursor: pointer;
-    transition: all ${sharedTokens.transitionDuration} ease-out;
+    padding: string,
+    override?: { borderRadius?: number; fontWeight?: number; transitionDuration?: number }
+  ) => {
+    const br = override?.borderRadius !== undefined ? override.borderRadius : sharedTokens.borderRadius;
+    const fw = override?.fontWeight !== undefined ? override.fontWeight : sharedTokens.fontWeight;
+    const td = override?.transitionDuration !== undefined ? override.transitionDuration : sharedTokens.transitionDuration;
 
-    &:hover {
-      background-color: ${hoverBackgroundColor};
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    }
+    return css`
+      padding: ${padding};
+      background-color: ${backgroundColor};
+      color: ${textColor};
+      border: none;
+      border-radius: ${br}px;
+      font-size: ${fontSize};
+      font-weight: ${fw};
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+      cursor: pointer;
+      transition: all ${td}ms ease-out;
 
-    &:active {
-      transform: scale(0.98);
-    }
+      &:hover {
+        background-color: ${hoverBackgroundColor};
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      }
 
-    &:focus-visible {
-      outline: 2px solid ${backgroundColor};
-      outline-offset: 2px;
+      &:active {
+        transform: scale(0.98);
+      }
+
+      &:focus-visible {
+        outline: 2px solid ${backgroundColor};
+        outline-offset: 2px;
+      }
+    `;
+  };
+
+  const handleSharedTokenChange = (key: keyof typeof sharedTokens, value: number) => {
+    setSharedTokens({ ...sharedTokens, [key]: value });
+  };
+
+  const handleKeyboardNav = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    key: string,
+    value: number,
+    setState: any,
+    config: any
+  ) => {
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setState((prev: any) => ({ ...prev, [key]: Math.min(value + config.step, config.max) }));
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setState((prev: any) => ({ ...prev, [key]: Math.max(value - config.step, config.min) }));
     }
-  `;
+  };
 
   const [expandedSections, setExpandedSections] = useState<string[]>(['shared', 'primary']);
 
@@ -285,13 +372,33 @@ export default function ButtonPage() {
           <ComponentPreview>
             <div css={sizeGridStyle}>
               {buttonSizes.map((size) => (
-                <div key={size.name} css={sizeButtonStyle}>
-                  <div className="label">{size.name} ({size.height})</div>
+                <div key={size.name} css={sizeButtonContainerStyle}>
+                  <div className="label">{size.name}</div>
+                  <div className="spec">H: {size.height} × W: {size.width}</div>
                   <div className="buttons">
-                    <button css={createButtonStyle(primaryColors.backgroundColor, primaryColors.textColor, primaryColors.hoverBackgroundColor, size.fontSize, size.padding)}>
+                    <button
+                      css={createButtonStyle(
+                        primaryColors.backgroundColor,
+                        primaryColors.textColor,
+                        primaryColors.hoverBackgroundColor,
+                        size.fontSize,
+                        size.padding,
+                        primaryOverride
+                      )}
+                    >
                       {size.name}
                     </button>
-                    <button css={createButtonStyle(secondaryColors.backgroundColor, secondaryColors.textColor, secondaryColors.hoverBackgroundColor, size.fontSize, size.padding)} style={{ border: `1px solid ${secondaryColors.borderColor}` }}>
+                    <button
+                      css={createButtonStyle(
+                        secondaryColors.backgroundColor,
+                        secondaryColors.textColor,
+                        secondaryColors.hoverBackgroundColor,
+                        size.fontSize,
+                        size.padding,
+                        secondaryOverride
+                      )}
+                      style={{ border: `1px solid ${secondaryColors.borderColor}` }}
+                    >
                       {size.name}
                     </button>
                   </div>
@@ -401,36 +508,31 @@ export default function ButtonPage() {
 
           {expandedSections.includes('shared') && (
             <div style={{ marginTop: '12px' }}>
-              <div css={tokenInputGroupStyle}>
-                <label>Border Radius</label>
-                <input
-                  type="text"
-                  value={sharedTokens.borderRadius}
-                  onChange={(e) =>
-                    setSharedTokens({ ...sharedTokens, borderRadius: e.target.value })
-                  }
-                />
-              </div>
-              <div css={tokenInputGroupStyle}>
-                <label>Font Weight</label>
-                <input
-                  type="text"
-                  value={sharedTokens.fontWeight}
-                  onChange={(e) =>
-                    setSharedTokens({ ...sharedTokens, fontWeight: parseInt(e.target.value) || 600 })
-                  }
-                />
-              </div>
-              <div css={tokenInputGroupStyle}>
-                <label>Transition Duration</label>
-                <input
-                  type="text"
-                  value={sharedTokens.transitionDuration}
-                  onChange={(e) =>
-                    setSharedTokens({ ...sharedTokens, transitionDuration: e.target.value })
-                  }
-                />
-              </div>
+              {Object.entries(sharedTokens).map(([key, value]) => {
+                const config = tokenConfig[key];
+                return (
+                  <div key={key} css={tokenInputGroupStyle}>
+                    <label>{key.replace(/([A-Z])/g, ' $1').trim()}</label>
+                    <div className="input-wrapper">
+                      <input
+                        type="number"
+                        value={value}
+                        onChange={(e) =>
+                          handleSharedTokenChange(key as keyof typeof sharedTokens, parseInt(e.target.value) || 0)
+                        }
+                        onKeyDown={(e) =>
+                          handleKeyboardNav(e, key, value, setSharedTokens, config)
+                        }
+                        step={config.step}
+                        min={config.min}
+                        max={config.max}
+                        className="with-suffix"
+                      />
+                      {config.suffix && <span className="input-suffix">{config.suffix}</span>}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -482,6 +584,45 @@ export default function ButtonPage() {
                   </div>
                 </div>
               ))}
+
+              {/* Primary Override */}
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e6e6e6' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#0aa5ff', marginBottom: '8px', textTransform: 'uppercase' }}>
+                  Override Shared Tokens
+                </label>
+                {Object.entries(primaryOverride).map(([key, value]) => {
+                  const config = tokenConfig[key];
+                  return (
+                    <div key={key} css={tokenInputGroupStyle}>
+                      <label>{key.replace(/([A-Z])/g, ' $1').trim()}</label>
+                      <div className="input-wrapper">
+                        <input
+                          type="number"
+                          value={value ?? ''}
+                          onChange={(e) =>
+                            setPrimaryOverride({
+                              ...primaryOverride,
+                              [key]: e.target.value ? parseInt(e.target.value) : null,
+                            })
+                          }
+                          onKeyDown={(e) => {
+                            if (value !== null) {
+                              handleKeyboardNav(e, key, value, setPrimaryOverride, config);
+                            }
+                          }}
+                          step={config.step}
+                          min={config.min}
+                          max={config.max}
+                          placeholder="Inherit"
+                          className="with-suffix"
+                          style={{ color: value === null ? '#c2c8cc' : '#2f3438' }}
+                        />
+                        {config.suffix && <span className="input-suffix">{config.suffix}</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -533,6 +674,45 @@ export default function ButtonPage() {
                   </div>
                 </div>
               ))}
+
+              {/* Secondary Override */}
+              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e6e6e6' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#0aa5ff', marginBottom: '8px', textTransform: 'uppercase' }}>
+                  Override Shared Tokens
+                </label>
+                {Object.entries(secondaryOverride).map(([key, value]) => {
+                  const config = tokenConfig[key];
+                  return (
+                    <div key={key} css={tokenInputGroupStyle}>
+                      <label>{key.replace(/([A-Z])/g, ' $1').trim()}</label>
+                      <div className="input-wrapper">
+                        <input
+                          type="number"
+                          value={value ?? ''}
+                          onChange={(e) =>
+                            setSecondaryOverride({
+                              ...secondaryOverride,
+                              [key]: e.target.value ? parseInt(e.target.value) : null,
+                            })
+                          }
+                          onKeyDown={(e) => {
+                            if (value !== null) {
+                              handleKeyboardNav(e, key, value, setSecondaryOverride, config);
+                            }
+                          }}
+                          step={config.step}
+                          min={config.min}
+                          max={config.max}
+                          placeholder="Inherit"
+                          className="with-suffix"
+                          style={{ color: value === null ? '#c2c8cc' : '#2f3438' }}
+                        />
+                        {config.suffix && <span className="input-suffix">{config.suffix}</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

@@ -38,13 +38,14 @@ export default function ButtonPage() {
   // 선택된 버튼 크기와 variant
   const [selectedSize, setSelectedSize] = useState<string>('Default');
   const [selectedVariant, setSelectedVariant] = useState<'primary' | 'secondary'>('primary');
+  const [isButtonSelected, setIsButtonSelected] = useState(false);
 
   // Primary 버튼 컬러 토큰
   const [primaryColors, setPrimaryColors] = useState({
-    backgroundColor: '#0aa5ff',
+    backgroundColor: '#000000',
     textColor: '#ffffff',
-    hoverBackgroundColor: '#0087cc',
-    activeBackgroundColor: '#005fa3',
+    hoverBackgroundColor: '#333333',
+    activeBackgroundColor: '#1a1a1a',
     disabledBackgroundColor: '#c2c8cc',
     disabledTextColor: '#828c94',
   });
@@ -512,6 +513,11 @@ export default function ButtonPage() {
                           primaryOverride
                         )}
                         style={{ minWidth: size.minWidth, width: size.width }}
+                        onClick={() => {
+                          setSelectedSize(size.name);
+                          setSelectedVariant('primary');
+                          setIsButtonSelected(true);
+                        }}
                       >
                         {size.name}
                       </button>
@@ -525,10 +531,15 @@ export default function ButtonPage() {
                           false,
                           secondaryOverride
                         )}
-                        style={{ 
+                        style={{
                           border: `1px solid ${secondaryColors.borderColor}`,
                           minWidth: size.minWidth,
                           width: size.width
+                        }}
+                        onClick={() => {
+                          setSelectedSize(size.name);
+                          setSelectedVariant('secondary');
+                          setIsButtonSelected(true);
                         }}
                       >
                         {size.name}
@@ -629,7 +640,8 @@ export default function ButtonPage() {
           )}
         </h3>
 
-        {/* Button Selection UI */}
+        {/* Button Selection UI - Only show when button is selected */}
+        {isButtonSelected && (
         <div css={buttonSelectionStyle}>
           <label>Size</label>
           <div className="selection-group">
@@ -660,6 +672,7 @@ export default function ButtonPage() {
             </button>
           </div>
         </div>
+        )}
 
         {/* Shared Tokens */}
         <div css={tokenGroupStyle}>
@@ -719,7 +732,7 @@ export default function ButtonPage() {
                                 min={tokenConfig.paddingTop.min}
                                 max={tokenConfig.paddingTop.max}
                                 style={{
-                                  width: '40px',
+                                  width: '55px',
                                   padding: '4px 6px',
                                   borderRadius: '4px',
                                   border: '1px solid #e6e6e6',
@@ -744,7 +757,7 @@ export default function ButtonPage() {
                               min={tokenConfig.paddingLeft.min}
                               max={tokenConfig.paddingLeft.max}
                               style={{
-                                width: '40px',
+                                width: '55px',
                                 padding: '4px 6px',
                                 borderRadius: '4px',
                                 border: '1px solid #e6e6e6',
@@ -766,7 +779,7 @@ export default function ButtonPage() {
                               min={tokenConfig.paddingRight.min}
                               max={tokenConfig.paddingRight.max}
                               style={{
-                                width: '40px',
+                                width: '55px',
                                 padding: '4px 6px',
                                 borderRadius: '4px',
                                 border: '1px solid #e6e6e6',
@@ -792,7 +805,7 @@ export default function ButtonPage() {
                                 min={tokenConfig.paddingBottom.min}
                                 max={tokenConfig.paddingBottom.max}
                                 style={{
-                                  width: '40px',
+                                  width: '55px',
                                   padding: '4px 6px',
                                   borderRadius: '4px',
                                   border: '1px solid #e6e6e6',

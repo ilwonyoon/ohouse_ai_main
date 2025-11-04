@@ -144,6 +144,34 @@ export default function DesignSystemHomepage() {
         </p>
       </div>
 
+      <div css={quickStartStyle}>
+        <h3 css={quickStartTitleStyle}>✨ Try the Interactive Editor</h3>
+        <p css={css`font-size: 16px; color: #2f3438; margin: 0 0 16px 0; line-height: 1.6;`}>
+          Edit design tokens in real-time and see changes instantly. Adjust typography, colors,
+          spacing, and export the modified configuration.
+        </p>
+        <Link
+          href="/design-system/editor"
+          css={css`
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #0aa5ff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+              background-color: #0895d9;
+            }
+          `}
+        >
+          Open Interactive Editor →
+        </Link>
+      </div>
+
       <div css={sectionStyle}>
         <h2>Key Features</h2>
         <div css={featureListStyle}>

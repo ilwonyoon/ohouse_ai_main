@@ -31,6 +31,10 @@ export default function ButtonPage() {
     paddingHorizontal: 20,
   });
 
+  // 선택된 버튼 크기와 variant
+  const [selectedSize, setSelectedSize] = useState<string>('Default');
+  const [selectedVariant, setSelectedVariant] = useState<'primary' | 'secondary'>('primary');
+
   // Primary 버튼 컬러 토큰
   const [primaryColors, setPrimaryColors] = useState({
     backgroundColor: '#0aa5ff',
@@ -298,6 +302,60 @@ export default function ButtonPage() {
     }
   `;
 
+  // 버튼 선택 UI 스타일
+  const buttonSelectionStyle = css`
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e6e6e6;
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #0aa5ff;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .selection-group {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    button {
+      padding: 8px 12px;
+      background-color: #f7f9fa;
+      color: #2f3438;
+      border: 1px solid #e6e6e6;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #f0f8ff;
+        border-color: #0aa5ff;
+      }
+
+      &.active {
+        background-color: #0aa5ff;
+        color: #ffffff;
+        border-color: #0aa5ff;
+        font-weight: 600;
+      }
+    }
+  `;
+
   // 버튼 스타일 생성 함수 - override 지원
   const createButtonStyle = (
     backgroundColor: string,
@@ -514,6 +572,38 @@ export default function ButtonPage() {
       <div css={rightPanelStyle}>
         <h3>Style Editor</h3>
 
+        {/* Button Selection UI */}
+        <div css={buttonSelectionStyle}>
+          <label>Size</label>
+          <div className="selection-group">
+            {buttonSizes.map((size) => (
+              <button
+                key={size.name}
+                className={selectedSize === size.name ? 'active' : ''}
+                onClick={() => setSelectedSize(size.name)}
+              >
+                {size.name}
+              </button>
+            ))}
+          </div>
+
+          <label>Variant</label>
+          <div className="selection-group">
+            <button
+              className={selectedVariant === 'primary' ? 'active' : ''}
+              onClick={() => setSelectedVariant('primary')}
+            >
+              🔵 Primary
+            </button>
+            <button
+              className={selectedVariant === 'secondary' ? 'active' : ''}
+              onClick={() => setSelectedVariant('secondary')}
+            >
+              ⚪ Secondary
+            </button>
+          </div>
+        </div>
+
         {/* Shared Tokens */}
         <div css={tokenGroupStyle}>
           <button
@@ -568,6 +658,7 @@ export default function ButtonPage() {
         </div>
 
         {/* Primary Colors */}
+        {selectedVariant === 'primary' && (
         <div css={tokenGroupStyle}>
           <button
             onClick={() => toggleSection('primary')}
@@ -656,8 +747,10 @@ export default function ButtonPage() {
             </div>
           )}
         </div>
+        )}
 
         {/* Secondary Colors */}
+        {selectedVariant === 'secondary' && (
         <div css={tokenGroupStyle}>
           <button
             onClick={() => toggleSection('secondary')}
@@ -746,6 +839,7 @@ export default function ButtonPage() {
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );

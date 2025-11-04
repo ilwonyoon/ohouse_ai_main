@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, ReactNode } from "next";
 import "@/styles/globals.css";
+import { EmotionProvider } from "./emotion-provider";
 
 export const metadata: Metadata = {
   title: "Ohouse AI - Interior Design Assistant",
@@ -9,12 +10,14 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <html lang="en">
       <body>
-        {children}
+        <EmotionProvider>
+          {children}
+        </EmotionProvider>
       </body>
     </html>
   );

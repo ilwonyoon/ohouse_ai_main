@@ -10,8 +10,10 @@ const tokenConfig: Record<string, { step: number; suffix: string; min: number; m
   borderRadius: { step: 1, suffix: 'px', min: 0, max: 24 },
   fontWeight: { step: 100, suffix: '', min: 100, max: 900 },
   transitionDuration: { step: 50, suffix: 'ms', min: 0, max: 1000 },
-  paddingVertical: { step: 1, suffix: 'px', min: 0, max: 20 },
-  paddingHorizontal: { step: 1, suffix: 'px', min: 0, max: 40 },
+  paddingTop: { step: 1, suffix: 'px', min: 0, max: 20 },
+  paddingRight: { step: 1, suffix: 'px', min: 0, max: 40 },
+  paddingBottom: { step: 1, suffix: 'px', min: 0, max: 20 },
+  paddingLeft: { step: 1, suffix: 'px', min: 0, max: 40 },
 };
 
 const colorTokenConfig = {
@@ -27,8 +29,10 @@ export default function ButtonPage() {
     borderRadius: 8,
     fontWeight: 600,
     transitionDuration: 200,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingRight: 20,
+    paddingBottom: 10,
+    paddingLeft: 20,
   });
 
   // 선택된 버튼 크기와 variant
@@ -64,8 +68,10 @@ export default function ButtonPage() {
     borderRadius?: number | null;
     fontWeight?: number | null;
     transitionDuration?: number | null;
-    paddingVertical?: number | null;
-    paddingHorizontal?: number | null;
+    paddingTop?: number | null;
+    paddingRight?: number | null;
+    paddingBottom?: number | null;
+    paddingLeft?: number | null;
   }
 
   const buttonSizeVariants = [
@@ -83,8 +89,10 @@ export default function ButtonPage() {
         borderRadius: null,
         fontWeight: null,
         transitionDuration: null,
-        paddingVertical: null,
-        paddingHorizontal: null,
+        paddingTop: null,
+        paddingRight: null,
+        paddingBottom: null,
+        paddingLeft: null,
       };
     });
     return initialOverrides;
@@ -382,19 +390,21 @@ export default function ButtonPage() {
     fontSize: string,
     padding: string,
     isPrimary: boolean = true,
-    override?: { borderRadius?: number; fontWeight?: number; transitionDuration?: number; paddingVertical?: number; paddingHorizontal?: number }
+    override?: { borderRadius?: number; fontWeight?: number; transitionDuration?: number; paddingTop?: number; paddingRight?: number; paddingBottom?: number; paddingLeft?: number }
   ) => {
     const br = override?.borderRadius ?? sharedTokens.borderRadius;
     const fw = override?.fontWeight ?? sharedTokens.fontWeight;
     const td = override?.transitionDuration ?? sharedTokens.transitionDuration;
-    const pv = override?.paddingVertical ?? sharedTokens.paddingVertical;
-    const ph = override?.paddingHorizontal ?? sharedTokens.paddingHorizontal;
+    const pt = override?.paddingTop ?? sharedTokens.paddingTop;
+    const pr = override?.paddingRight ?? sharedTokens.paddingRight;
+    const pb = override?.paddingBottom ?? sharedTokens.paddingBottom;
+    const pl = override?.paddingLeft ?? sharedTokens.paddingLeft;
     
     // 선택된 색상 토큰 사용 (primary/secondary에 따라)
     const colors = isPrimary ? primaryColors : secondaryColors;
     
     // 동적 padding 생성
-    const dynamicPadding = `${pv}px ${ph}px`;
+    const dynamicPadding = `${pt}px ${pr}px ${pb}px ${pl}px`;
     
     return css`
       padding: ${dynamicPadding};
@@ -659,6 +669,133 @@ export default function ButtonPage() {
           {expandedSections.includes('shared') && (
             <div style={{ marginTop: '12px' }}>
               {Object.entries(sharedTokens).map(([key, value]) => {
+                // Padding 필드는 특별한 그룹으로 처리
+                if (key.startsWith('padding')) {
+                  // Padding 그룹은 첫 번째 padding 필드에서만 렌더링
+                  if (key === 'paddingTop') {
+                    return (
+                      <div key="padding-group" style={{ marginBottom: '16px' }}>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#2f3438', marginBottom: '8px', textTransform: 'capitalize' }}>
+                          Padding
+                        </label>
+                        {/* Padding visual representation */}
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '8px',
+                          marginBottom: '8px',
+                          padding: '12px',
+                          backgroundColor: '#f7f9fa',
+                          borderRadius: '6px',
+                          border: '1px solid #e6e6e6',
+                        }}>
+                          {/* Top */}
+                          <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '11px', color: '#828c94' }}>↑</span>
+                              <input
+                                type="number"
+                                value={sharedTokens.paddingTop}
+                                onChange={(e) => handleSharedTokenChange('paddingTop', parseInt(e.target.value) || 0)}
+                                onKeyDown={(e) => handleKeyboardNav(e, 'paddingTop', sharedTokens.paddingTop, setSharedTokens, tokenConfig.paddingTop)}
+                                step={tokenConfig.paddingTop.step}
+                                min={tokenConfig.paddingTop.min}
+                                max={tokenConfig.paddingTop.max}
+                                style={{
+                                  width: '40px',
+                                  padding: '4px 6px',
+                                  borderRadius: '4px',
+                                  border: '1px solid #e6e6e6',
+                                  fontSize: '12px',
+                                  textAlign: 'center',
+                                  fontFamily: 'monospace',
+                                }}
+                              />
+                              <span style={{ fontSize: '11px', color: '#c2c8cc' }}>px</span>
+                            </div>
+                          </div>
+
+                          {/* Left & Right */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+                            <span style={{ fontSize: '11px', color: '#828c94' }}>←</span>
+                            <input
+                              type="number"
+                              value={sharedTokens.paddingLeft}
+                              onChange={(e) => handleSharedTokenChange('paddingLeft', parseInt(e.target.value) || 0)}
+                              onKeyDown={(e) => handleKeyboardNav(e, 'paddingLeft', sharedTokens.paddingLeft, setSharedTokens, tokenConfig.paddingLeft)}
+                              step={tokenConfig.paddingLeft.step}
+                              min={tokenConfig.paddingLeft.min}
+                              max={tokenConfig.paddingLeft.max}
+                              style={{
+                                width: '40px',
+                                padding: '4px 6px',
+                                borderRadius: '4px',
+                                border: '1px solid #e6e6e6',
+                                fontSize: '12px',
+                                textAlign: 'center',
+                                fontFamily: 'monospace',
+                              }}
+                            />
+                            <span style={{ fontSize: '11px', color: '#c2c8cc' }}>px</span>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+                            <input
+                              type="number"
+                              value={sharedTokens.paddingRight}
+                              onChange={(e) => handleSharedTokenChange('paddingRight', parseInt(e.target.value) || 0)}
+                              onKeyDown={(e) => handleKeyboardNav(e, 'paddingRight', sharedTokens.paddingRight, setSharedTokens, tokenConfig.paddingRight)}
+                              step={tokenConfig.paddingRight.step}
+                              min={tokenConfig.paddingRight.min}
+                              max={tokenConfig.paddingRight.max}
+                              style={{
+                                width: '40px',
+                                padding: '4px 6px',
+                                borderRadius: '4px',
+                                border: '1px solid #e6e6e6',
+                                fontSize: '12px',
+                                textAlign: 'center',
+                                fontFamily: 'monospace',
+                              }}
+                            />
+                            <span style={{ fontSize: '11px', color: '#c2c8cc' }}>px</span>
+                            <span style={{ fontSize: '11px', color: '#828c94' }}>→</span>
+                          </div>
+
+                          {/* Bottom */}
+                          <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '11px', color: '#828c94' }}>↓</span>
+                              <input
+                                type="number"
+                                value={sharedTokens.paddingBottom}
+                                onChange={(e) => handleSharedTokenChange('paddingBottom', parseInt(e.target.value) || 0)}
+                                onKeyDown={(e) => handleKeyboardNav(e, 'paddingBottom', sharedTokens.paddingBottom, setSharedTokens, tokenConfig.paddingBottom)}
+                                step={tokenConfig.paddingBottom.step}
+                                min={tokenConfig.paddingBottom.min}
+                                max={tokenConfig.paddingBottom.max}
+                                style={{
+                                  width: '40px',
+                                  padding: '4px 6px',
+                                  borderRadius: '4px',
+                                  border: '1px solid #e6e6e6',
+                                  fontSize: '12px',
+                                  textAlign: 'center',
+                                  fontFamily: 'monospace',
+                                }}
+                              />
+                              <span style={{ fontSize: '11px', color: '#c2c8cc' }}>px</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  // 나머지 padding 필드는 스킵
+                  return null;
+                }
+
+                // 일반 토큰 필드
                 const config = tokenConfig[key];
                 return (
                   <div key={key} css={tokenInputGroupStyle}>

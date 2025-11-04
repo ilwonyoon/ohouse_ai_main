@@ -435,7 +435,18 @@ export default function ButtonPage() {
   };
 
   const handleSharedTokenChange = (key: keyof typeof sharedTokens, value: number) => {
-    setSharedTokens({ ...sharedTokens, [key]: value });
+    // 패딩 좌우/상하 동기화
+    if (key === 'paddingLeft') {
+      setSharedTokens({ ...sharedTokens, paddingLeft: value, paddingRight: value });
+    } else if (key === 'paddingRight') {
+      setSharedTokens({ ...sharedTokens, paddingLeft: value, paddingRight: value });
+    } else if (key === 'paddingTop') {
+      setSharedTokens({ ...sharedTokens, paddingTop: value, paddingBottom: value });
+    } else if (key === 'paddingBottom') {
+      setSharedTokens({ ...sharedTokens, paddingTop: value, paddingBottom: value });
+    } else {
+      setSharedTokens({ ...sharedTokens, [key]: value });
+    }
   };
 
   const handleKeyboardNav = (
@@ -479,6 +490,12 @@ export default function ButtonPage() {
                 const displayWidth = size.minWidth || size.width;
                 const widthDisplay = size.minWidth ? `Min: ${size.minWidth}` : `W: ${displayWidth}`;
                 
+                // 현재 렌더링 중인 사이즈의 override 가져오기
+                const primaryOverrideKey = `${size.name}_primary`;
+                const secondaryOverrideKey = `${size.name}_secondary`;
+                const primaryOverride = buttonOverrides[primaryOverrideKey];
+                const secondaryOverride = buttonOverrides[secondaryOverrideKey];
+                
                 return (
                   <div key={size.name} css={sizeButtonContainerStyle}>
                     <div className="label">{size.name}</div>
@@ -492,7 +509,7 @@ export default function ButtonPage() {
                           size.fontSize,
                           size.padding,
                           true,
-                          currentOverride
+                          primaryOverride
                         )}
                         style={{ minWidth: size.minWidth, width: size.width }}
                       >
@@ -506,7 +523,7 @@ export default function ButtonPage() {
                           size.fontSize,
                           size.padding,
                           false,
-                          currentOverride
+                          secondaryOverride
                         )}
                         style={{ 
                           border: `1px solid ${secondaryColors.borderColor}`,
@@ -675,7 +692,7 @@ export default function ButtonPage() {
                   if (key === 'paddingTop') {
                     return (
                       <div key="padding-group" style={{ marginBottom: '16px' }}>
-                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: '#2f3438', marginBottom: '8px', textTransform: 'capitalize' }}>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#2f3438', marginBottom: '8px', textTransform: 'capitalize' }}>
                           Padding
                         </label>
                         {/* Padding visual representation */}
@@ -685,7 +702,7 @@ export default function ButtonPage() {
                           gap: '8px',
                           marginBottom: '8px',
                           padding: '12px',
-                          backgroundColor: '#f7f9fa',
+                          backgroundColor: '#ffffff',
                           borderRadius: '6px',
                           border: '1px solid #e6e6e6',
                         }}>
@@ -887,15 +904,22 @@ export default function ButtonPage() {
                         <input
                           type="number"
                           value={value ?? ''}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            const newValue = e.target.value ? parseInt(e.target.value) : null;
+                            
+                            // 패딩 좌우/상하 동기화
+                            let updatedOverride = { ...currentOverride, [key]: newValue };
+                            if (key === 'paddingLeft' || key === 'paddingRight') {
+                              updatedOverride = { ...updatedOverride, paddingLeft: newValue, paddingRight: newValue };
+                            } else if (key === 'paddingTop' || key === 'paddingBottom') {
+                              updatedOverride = { ...updatedOverride, paddingTop: newValue, paddingBottom: newValue };
+                            }
+                            
                             setButtonOverrides({
                               ...buttonOverrides,
-                              [currentButtonKey]: {
-                                ...currentOverride,
-                                [key]: e.target.value ? parseInt(e.target.value) : null,
-                              },
-                            })
-                          }
+                              [currentButtonKey]: updatedOverride,
+                            });
+                          }}
                           onKeyDown={(e) => {
                             if (value !== null) {
                               handleKeyboardNav(e, key, value, setButtonOverrides, config);
@@ -982,15 +1006,22 @@ export default function ButtonPage() {
                         <input
                           type="number"
                           value={value ?? ''}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            const newValue = e.target.value ? parseInt(e.target.value) : null;
+                            
+                            // 패딩 좌우/상하 동기화
+                            let updatedOverride = { ...currentOverride, [key]: newValue };
+                            if (key === 'paddingLeft' || key === 'paddingRight') {
+                              updatedOverride = { ...updatedOverride, paddingLeft: newValue, paddingRight: newValue };
+                            } else if (key === 'paddingTop' || key === 'paddingBottom') {
+                              updatedOverride = { ...updatedOverride, paddingTop: newValue, paddingBottom: newValue };
+                            }
+                            
                             setButtonOverrides({
                               ...buttonOverrides,
-                              [currentButtonKey]: {
-                                ...currentOverride,
-                                [key]: e.target.value ? parseInt(e.target.value) : null,
-                              },
-                            })
-                          }
+                              [currentButtonKey]: updatedOverride,
+                            });
+                          }}
                           onKeyDown={(e) => {
                             if (value !== null) {
                               handleKeyboardNav(e, key, value, setButtonOverrides, config);

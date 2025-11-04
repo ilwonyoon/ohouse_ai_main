@@ -1,10 +1,45 @@
 'use client';
 
+import { useState } from 'react';
 import { css } from '@emotion/react';
 import { CodeBlock } from '../CodeBlock';
 import { ComponentPreview } from '../ComponentPreview';
+import { SemanticTokenEditor } from '../SemanticTokenEditor';
 
 export default function ButtonPage() {
+  const [primaryTokens, setPrimaryTokens] = useState({
+    backgroundColor: '#0aa5ff',
+    textColor: '#ffffff',
+    hoverBackgroundColor: '#0087cc',
+    borderRadius: '6px',
+    padding: '10px 20px',
+    fontSize: '14px',
+  });
+
+  const handlePrimaryTokenChange = (tokenKey: string, value: string | number) => {
+    setPrimaryTokens((prev) => ({
+      ...prev,
+      [tokenKey]: value,
+    }));
+  };
+
+  const [secondaryTokens, setSecondaryTokens] = useState({
+    backgroundColor: '#f7f9fa',
+    textColor: '#2f3438',
+    borderColor: '#e6e6e6',
+    hoverBackgroundColor: '#f0f8ff',
+    hoverTextColor: '#0aa5ff',
+    borderRadius: '6px',
+    padding: '10px 20px',
+    fontSize: '14px',
+  });
+
+  const handleSecondaryTokenChange = (tokenKey: string, value: string | number) => {
+    setSecondaryTokens((prev) => ({
+      ...prev,
+      [tokenKey]: value,
+    }));
+  };
   const pageStyle = css`
     max-width: 900px;
   `;
@@ -101,18 +136,18 @@ export default function ButtonPage() {
   `;
 
   const primaryButtonStyle = css`
-    padding: 10px 20px;
-    background-color: #0aa5ff;
-    color: #ffffff;
+    padding: ${primaryTokens.padding};
+    background-color: ${primaryTokens.backgroundColor};
+    color: ${primaryTokens.textColor};
     border: none;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: ${primaryTokens.borderRadius};
+    font-size: ${primaryTokens.fontSize};
     font-weight: 600;
     cursor: pointer;
     transition: all 200ms ease-out;
 
     &:hover {
-      background-color: #0087cc;
+      background-color: ${primaryTokens.hoverBackgroundColor};
       box-shadow: 0 2px 8px rgba(10, 165, 255, 0.24);
     }
 
@@ -121,26 +156,26 @@ export default function ButtonPage() {
     }
 
     &:focus-visible {
-      outline: 2px solid #0aa5ff;
+      outline: 2px solid ${primaryTokens.backgroundColor};
       outline-offset: 2px;
     }
   `;
 
   const secondaryButtonStyle = css`
-    padding: 10px 20px;
-    background-color: #f7f9fa;
-    color: #2f3438;
-    border: 1px solid #e6e6e6;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: ${secondaryTokens.padding};
+    background-color: ${secondaryTokens.backgroundColor};
+    color: ${secondaryTokens.textColor};
+    border: 1px solid ${secondaryTokens.borderColor};
+    border-radius: ${secondaryTokens.borderRadius};
+    font-size: ${secondaryTokens.fontSize};
     font-weight: 600;
     cursor: pointer;
     transition: all 200ms ease-out;
 
     &:hover {
-      border-color: #0aa5ff;
-      color: #0aa5ff;
-      background-color: #f0f8ff;
+      border-color: ${secondaryTokens.hoverTextColor};
+      color: ${secondaryTokens.hoverTextColor};
+      background-color: ${secondaryTokens.hoverBackgroundColor};
     }
 
     &:active {
@@ -148,7 +183,7 @@ export default function ButtonPage() {
     }
 
     &:focus-visible {
-      outline: 2px solid #0aa5ff;
+      outline: 2px solid ${secondaryTokens.hoverTextColor};
       outline-offset: 2px;
     }
   `;
@@ -256,6 +291,18 @@ export function MyComponent() {
             <button css={dangerButtonStyle}>Danger</button>
           </div>
         </ComponentPreview>
+
+        <SemanticTokenEditor
+          componentName="Primary Button"
+          tokens={primaryTokens}
+          onTokenChange={handlePrimaryTokenChange}
+        />
+
+        <SemanticTokenEditor
+          componentName="Secondary Button"
+          tokens={secondaryTokens}
+          onTokenChange={handleSecondaryTokenChange}
+        />
 
         <h3 css={css`margin: 32px 0 16px 0; font-size: 18px; font-weight: 600; color: #2f3438;`}>
           States

@@ -570,7 +570,19 @@ export default function ButtonPage() {
 
       {/* Right Panel Editor */}
       <div css={rightPanelStyle}>
-        <h3>Style Editor</h3>
+        <h3>
+          Style Editor
+          {selectedSize && selectedVariant && (
+            <span style={{ 
+              fontSize: '12px', 
+              fontWeight: '400', 
+              color: '#828c94',
+              marginLeft: '8px'
+            }}>
+              — {selectedSize} ({selectedVariant === 'primary' ? '🔵' : '⚪'})
+            </span>
+          )}
+        </h3>
 
         {/* Button Selection UI */}
         <div css={buttonSelectionStyle}>

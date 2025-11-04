@@ -200,12 +200,6 @@ export function MyComponent() {
   );
 }`;
 
-  const basicUsageCode = `<Button>Default Button</Button>
-<Button variant="primary">Primary Button</Button>
-<Button variant="secondary">Secondary Button</Button>
-<Button variant="danger">Danger Button</Button>
-<Button disabled>Disabled Button</Button>`;
-
   const propsCode = `interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'danger';
   size?: 'sm' | 'md' | 'lg';

@@ -20,7 +20,7 @@ export interface LLMResponse {
 /**
  * Call ChatGPT for design suggestions based on room details
  */
-export async function getDesignSuggestions(prompt: string): Promise<LLMResponse> {
+export async function getDesignSuggestions(_prompt: string): Promise<LLMResponse> {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY is not set');
   }
@@ -34,7 +34,7 @@ export async function getDesignSuggestions(prompt: string): Promise<LLMResponse>
  * Refine design suggestions based on user feedback
  */
 export async function refineDesignSuggestions(
-  messages: ChatMessage[]
+  _messages: ChatMessage[]
 ): Promise<LLMResponse> {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY is not set');

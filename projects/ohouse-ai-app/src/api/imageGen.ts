@@ -19,7 +19,7 @@ export interface ImageGenerationResponse {
  * Generate design mockup image based on design suggestion
  */
 export async function generateDesignImage(
-  request: ImageGenerationRequest
+  _request: ImageGenerationRequest
 ): Promise<ImageGenerationResponse> {
   if (!process.env.NANO_BANANAS_API_KEY) {
     throw new Error('NANO_BANANAS_API_KEY is not set');

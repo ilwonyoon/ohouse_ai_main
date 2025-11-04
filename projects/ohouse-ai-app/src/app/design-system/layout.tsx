@@ -218,10 +218,18 @@ export default function DesignSystemLayout({ children }: DesignSystemLayoutProps
       <div css={contentStyle}>
         <aside css={sidebarStyle}>
           <nav css={sectionStyle}>
+            <div css={sectionTitleStyle}>Foundation</div>
+            <a href="/design-system/foundation/typography" css={navItemStyle}>Typography</a>
+            <a href="/design-system/foundation/colors" css={navItemStyle}>Colors</a>
+            <a href="/design-system/foundation/spacing" css={navItemStyle}>Spacing</a>
+            <a href="/design-system/foundation/icons" css={navItemStyle}>Icons</a>
+          </nav>
+
+          <nav css={sectionStyle}>
             <div css={sectionTitleStyle}>Getting Started</div>
             <a href="/design-system" css={navItemStyle}>Overview</a>
-            <a href="/design-system#tokens" css={navItemStyle}>Design Tokens</a>
-            <a href="/design-system#accessibility" css={navItemStyle}>Accessibility</a>
+            <a href="/design-system/foundation/tokens" css={navItemStyle}>Design Tokens</a>
+            <a href="/design-system/foundation/accessibility" css={navItemStyle}>Accessibility</a>
           </nav>
 
           <nav css={sectionStyle}>

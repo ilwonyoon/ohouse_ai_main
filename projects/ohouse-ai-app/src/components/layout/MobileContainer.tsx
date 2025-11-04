@@ -13,14 +13,12 @@ export default function MobileContainer({ children }: MobileContainerProps) {
     width: '375px',
     height: '812px',
 
-    // Center on larger screens
-    margin: '0 auto',
-
     // Container behavior
     position: 'relative',
     overflow: 'hidden',
     background: '#ffffff',
-    boxShadow: '0 0 20px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
+    borderRadius: '20px',
 
     // Safe area for notch-aware phones
     display: 'flex',
@@ -40,9 +38,10 @@ export default function MobileContainer({ children }: MobileContainerProps) {
       css={css`
         display: flex;
         justify-content: center;
-        align-items: flex-start;
+        align-items: center;
         min-height: 100vh;
         padding: 20px;
+        background: #f5f5f5;
 
         @media (max-width: 425px) {
           padding: 0;

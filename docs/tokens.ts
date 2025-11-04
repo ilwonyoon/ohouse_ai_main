@@ -411,10 +411,160 @@ export namespace LayoutTokens {
 }
 
 // ============================================================================
+// ANIMATION TOKENS
+// ============================================================================
+
+export namespace AnimationTokens {
+  export namespace Duration {
+    export const FAST = '150ms';
+    export const NORMAL = '300ms';
+    export const SLOW = '500ms';
+    export const SLOWER = '800ms';
+  }
+
+  export namespace Easing {
+    export const STANDARD = 'cubic-bezier(0.4, 0, 0.2, 1)';
+    export const ENTRANCE = 'cubic-bezier(0, 0, 0.2, 1)';
+    export const EXIT = 'cubic-bezier(0.4, 0, 1, 1)';
+    export const INTERACTIVE = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+  }
+
+  export namespace Transition {
+    export const DEFAULT = 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+    export const COLOR = 'color 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+    export const OPACITY = 'opacity 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+    export const TRANSFORM = 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+    export const SHADOW = 'box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1)';
+  }
+}
+
+// ============================================================================
+// STATE TOKENS
+// ============================================================================
+
+export namespace StateTokens {
+  export interface ButtonState {
+    background?: string;
+    color?: string;
+    opacity?: number;
+    outline?: string;
+    outlineOffset?: string;
+    border?: string;
+  }
+
+  export const Button = {
+    primary: {
+      default: { background: '#2F3438', color: '#FFFFFF' },
+      hover: { background: '#1a1d21', opacity: 0.85 },
+      active: { background: '#0f1115', opacity: 0.70 },
+      focus: { outline: '2px solid #0AA5FF', outlineOffset: '2px' },
+      disabled: { background: '#C2C8CC', color: '#828C94', opacity: 0.5 }
+    },
+    secondary: {
+      default: { background: '#FFFFFF', border: '1px #E6E6E6', color: '#2F3438' },
+      hover: { background: '#F7F9FA', border: '1px #DADDE0' },
+      active: { background: '#EAEDEF', border: '1px #DADDE0' },
+      disabled: { background: '#F5F5F5', border: '1px #E6E6E6', color: '#828C94' }
+    }
+  };
+
+  export const Input = {
+    default: { background: '#FFFFFF', border: '1px #E6E6E6', color: '#828C94' },
+    hover: { border: '1px #DADDE0' },
+    focus: { border: '2px #0AA5FF', boxShadow: '0 0 0 3px rgba(10, 165, 255, 0.1)' },
+    filled: { color: '#2F3438' },
+    disabled: { background: '#F5F5F5', border: '1px #E6E6E6', color: '#C2C8CC' },
+    error: { border: '2px #E74C3C', boxShadow: '0 0 0 3px rgba(231, 76, 60, 0.1)' },
+    success: { border: '2px #27AE60' }
+  };
+
+  export const Card = {
+    default: { background: '#FFFFFF', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' },
+    hover: { boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)', transform: 'translateY(-2px)' },
+    active: { background: '#F7F9FA' }
+  };
+}
+
+// ============================================================================
+// UTILITY TOKENS
+// ============================================================================
+
+export namespace UtilityTokens {
+  export namespace Shadow {
+    export const NONE = 'none';
+    export const XS = '0 1px 2px rgba(0, 0, 0, 0.05)';
+    export const SM = '0 2px 8px rgba(0, 0, 0, 0.08)';
+    export const MD = '0 4px 16px rgba(0, 0, 0, 0.12)';
+    export const LG = '0 8px 24px rgba(0, 0, 0, 0.12)';
+    export const XL = '0 12px 32px rgba(0, 0, 0, 0.16)';
+  }
+
+  export namespace Transform {
+    export const SCALE_UP = 'scale(1.02)';
+    export const SCALE_DOWN = 'scale(0.98)';
+    export const SCALE_PRESS = 'scale(0.96)';
+    export const LIFT = 'translateY(-2px)';
+    export const LIFT_SM = 'translateY(-1px)';
+  }
+
+  export namespace ZIndex {
+    export const BASE = 0;
+    export const DROPDOWN = 100;
+    export const STICKY = 200;
+    export const FIXED = 300;
+    export const MODAL = 400;
+    export const TOAST = 500;
+    export const TOOLTIP = 600;
+  }
+
+  export namespace BackdropFilter {
+    export const BLUR = 'blur(8px)';
+    export const BLUR_TIGHT = 'blur(2px)';
+    export const BLUR_MEDIUM = 'blur(25px)';
+  }
+}
+
+// ============================================================================
+// ACCESSIBILITY TOKENS
+// ============================================================================
+
+export namespace AccessibilityTokens {
+  export namespace Focus {
+    export const OUTLINE = '2px solid #0AA5FF';
+    export const OUTLINE_OFFSET = '2px';
+    export const BORDER_RADIUS = 'inherit';
+  }
+
+  export namespace HighContrast {
+    export const TEXT_DEFAULT = '#000000';
+    export const TEXT_SECONDARY = '#333333';
+    export const BORDER = '#000000';
+    export const BACKGROUND = '#FFFFFF';
+  }
+
+  export namespace ReducedMotion {
+    export const DURATION = '0.01ms';
+    export const ANIMATION_ITERATION_COUNT = 1;
+    export const TRANSITION_DURATION = '0.01ms';
+  }
+}
+
+// ============================================================================
+// RESPONSIVE BREAKPOINTS
+// ============================================================================
+
+export namespace ResponsiveTokens {
+  export const MOBILE = '375px';
+  export const TABLET = '768px';
+  export const DESKTOP = '1024px';
+  export const WIDE = '1440px';
+}
+
+// ============================================================================
 // EXPORT TYPES FOR USAGE
 // ============================================================================
 
-export type ColorToken = 
+export type ColorToken =
   | 'bg-default'
   | 'bg-inverse'
   | 'fg-default'
@@ -437,3 +587,11 @@ export type TypographyToken =
 export type SpacingToken = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl' | 'huge';
 
 export type RadiusToken = 'tight' | 'smooth' | 'full';
+
+export type DurationToken = 'fast' | 'normal' | 'slow' | 'slower';
+
+export type EasingToken = 'standard' | 'entrance' | 'exit' | 'interactive';
+
+export type ShadowToken = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+export type BreakpointToken = 'mobile' | 'tablet' | 'desktop' | 'wide';

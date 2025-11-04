@@ -18,29 +18,24 @@ Ohouse_ai_onGoing/
 
 ## 🚀 Projects
 
-### 1. Ohouse AI App
-- **Description**: AI-powered mobile interior design assistant
-- **Viewport**: 375px × 812px (mobile)
-- **Tech**: Next.js 15.3.0, React 19.0.0, TypeScript, Emotion, Jotai, TanStack Query
-- **Status**: Running on http://localhost:3002
+### Ohouse AI (Main Project)
+- **Description**: Central hub for interior design features with MacOS Desktop-style launcher
+- **Architecture**: Single Next.js app with multiple feature routes
+- **Features**: Entry Revival, Onboarding, Room Editor, Gallery, Settings
+- **Status**: 🚀 Running on http://localhost:3002
 - **Location**: `projects/ohouse-ai-app/`
+
+**Features accessible at:**
+- 🏠 Home (Desktop): `http://localhost:3002/`
+- 📝 Entry Revival: `http://localhost:3002/feature_entry`
+- 🎯 Onboarding: `http://localhost:3002/onboarding`
+- 🎨 Room Editor: `http://localhost:3002/room_editor`
+- 🖼️ Gallery: `http://localhost:3002/gallery`
+- ⚙️ Settings: `http://localhost:3002/settings`
 
 ```bash
 cd projects/ohouse-ai-app
-npm install
-npm run dev
-```
-
-### 2. Feature Entry Revival
-- **Description**: Entry management feature prototype
-- **Tech**: Next.js 15.3.0, React 19.0.0, TypeScript, Emotion, Jotai, TanStack Query
-- **Status**: Initialized ✅ - Ready for development
-- **Location**: `projects/feature_entry_revival/`
-
-```bash
-cd projects/feature_entry_revival
-npm install
-npm run dev
+npm run dev  # Already running!
 ```
 
 ## 🛠️ Tech Stack (All Projects)

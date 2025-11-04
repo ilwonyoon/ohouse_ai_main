@@ -1,62 +1,78 @@
-# Ohouse AI - Mobile App
+# Ohouse AI - Multi-Feature Application
 
-> AI-powered interior design assistant | Mobile prototype (375x812px)
+> AI-powered interior design assistant | MacOS Desktop-style launcher with multiple feature projects
 
 ## 🎯 App Overview
 
-- **Purpose**: AI-driven interior design recommendations using LLM (ChatGPT)
-- **Target**: Mobile users (iPhone, portrait orientation)
-- **Viewport**: 375px width × 812px height (fixed)
-- **Status**: Initialized ✅ - Ready for feature development
+- **Purpose**: Central hub for interior design features (Entry Revival, Onboarding, Room Editor, etc.)
+- **Structure**: MacOS Desktop-style home screen with clickable app icons
+- **Architecture**: Single Next.js app with multiple feature routes
 - **Tech Stack**: Next.js 15.3 + React 19 + TypeScript + Emotion + Jotai
 
-## 📱 Features (Incremental Build)
+## 🏠 Home Screen (MacOS Desktop)
 
-- [x] **Project Setup**: Next.js, TypeScript, Emotion configured
-- [x] **Mobile Container**: Fixed 375x812px viewport
-- [x] **Home Component**: Placeholder home screen
-- [ ] **Room Input**: Form for room details, style preferences, budget
-- [ ] **LLM Processing**: ChatGPT API integration for design suggestions
-- [ ] **Design Results**: Display AI recommendations
-- [ ] **Image Preview**: Show generated images (future with Nano bananas)
-- [ ] **Gallery**: Save and manage designs (future)
+Features displayed as app icons:
+- 📝 **Entry Revival**: Entry management
+- 🎯 **Onboarding**: User setup and preferences
+- 🎨 **Room Editor**: Design space editor
+- 🖼️ **Gallery**: Design collection viewer
+- ⚙️ **Settings**: App preferences
+
+## 📱 Feature Routes
+
+- [x] **Home**: MacOS-style desktop with app icons
+- [x] **Entry Revival** (`/feature_entry`): Entry management feature
+- [x] **Onboarding** (`/onboarding`): User setup flow
+- [x] **Room Editor** (`/room_editor`): Design editor interface
+- [x] **Gallery** (`/gallery`): Design collection
+- [x] **Settings** (`/settings`): App preferences
+- [ ] **LLM Integration**: ChatGPT API for design suggestions
+- [ ] **Image Generation**: Nano bananas integration
 
 ## 📁 Project Structure
 
 ```
 projects/ohouse-ai-app/
 ├── src/
-│   ├── app/                         # Next.js app directory
+│   ├── app/                         # Next.js app directory (routing)
 │   │   ├── layout.tsx               # Root layout
-│   │   └── page.tsx                 # Home page
+│   │   ├── page.tsx                 # Home (MacOS Desktop)
+│   │   ├── feature_entry/           # Entry Revival feature
+│   │   │   └── page.tsx             # Entry management
+│   │   ├── onboarding/              # Onboarding feature
+│   │   │   └── page.tsx             # User setup flow
+│   │   ├── room_editor/             # Room Editor feature
+│   │   │   └── page.tsx             # Design editor
+│   │   ├── gallery/                 # Gallery feature
+│   │   │   └── page.tsx             # Design collection
+│   │   └── settings/                # Settings feature
+│   │       └── page.tsx             # App preferences
 │   ├── components/
+│   │   ├── desktop/
+│   │   │   ├── Desktop.tsx          # MacOS desktop launcher
+│   │   │   └── AppIcon.tsx          # App icon component
 │   │   ├── layout/
 │   │   │   └── MobileContainer.tsx  # 375x812 viewport wrapper
-│   │   ├── common/                  # Reusable UI components (WIP)
-│   │   └── features/                # Feature-specific components
-│   │       ├── home/                # Home screen
-│   │       ├── room-input/          # Room input flow (WIP)
-│   │       ├── design-suggestions/  # Results display (WIP)
-│   │       └── image-gallery/       # Gallery (WIP)
+│   │   ├── common/                  # Reusable UI components
+│   │   └── features/                # Feature-specific components (expandable)
 │   ├── hooks/
 │   │   ├── useLLM.ts                # ChatGPT integration
 │   │   └── useDesignState.ts        # Jotai state management
 │   ├── api/
 │   │   ├── llm.ts                   # ChatGPT API client
-│   │   └── imageGen.ts              # Image generation client (future)
+│   │   └── imageGen.ts              # Image generation client
 │   ├── types/
 │   │   ├── room.ts                  # Room types
 │   │   ├── design.ts                # Design types
 │   │   └── llm.ts                   # LLM response types
 │   └── styles/
 │       ├── globals.css              # Global styles
-│       └── theme.ts                 # Design tokens (WIP)
+│       └── theme.ts                 # Design tokens
 ├── public/                          # Static assets
 ├── .env.example                     # Environment template
 ├── next.config.ts                   # Next.js config
 ├── tsconfig.json                    # TypeScript config
 ├── .eslintrc.json                   # ESLint config
-├── .gitignore
 └── package.json
 ```
 

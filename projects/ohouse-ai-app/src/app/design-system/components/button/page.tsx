@@ -58,23 +58,41 @@ export default function ButtonPage() {
     disabledBorderColor: '#e6e6e6',
   });
 
-  // Primary override 토큰 (스타일 재정의용)
-  const [primaryOverride, setPrimaryOverride] = useState({
-    borderRadius: null as number | null,
-    fontWeight: null as number | null,
-    transitionDuration: null as number | null,
-    paddingVertical: null as number | null,
-    paddingHorizontal: null as number | null,
+  // 버튼별 토큰 오버라이드 (크기_variant 조합별)
+  // 예: "Small_primary", "Medium_primary", "Large_secondary" 등
+  interface ButtonOverride {
+    borderRadius?: number | null;
+    fontWeight?: number | null;
+    transitionDuration?: number | null;
+    paddingVertical?: number | null;
+    paddingHorizontal?: number | null;
+  }
+
+  const buttonSizeVariants = [
+    'Small_primary', 'Small_secondary',
+    'Medium_primary', 'Medium_secondary',
+    'Default_primary', 'Default_secondary',
+    'Large_primary', 'Large_secondary',
+    'ExtraLarge_primary', 'ExtraLarge_secondary'
+  ];
+
+  const [buttonOverrides, setButtonOverrides] = useState<Record<string, ButtonOverride>>(() => {
+    const initialOverrides: Record<string, ButtonOverride> = {};
+    buttonSizeVariants.forEach(variant => {
+      initialOverrides[variant] = {
+        borderRadius: null,
+        fontWeight: null,
+        transitionDuration: null,
+        paddingVertical: null,
+        paddingHorizontal: null,
+      };
+    });
+    return initialOverrides;
   });
 
-  // Secondary override 토큰 (스타일 재정의용)
-  const [secondaryOverride, setSecondaryOverride] = useState({
-    borderRadius: null as number | null,
-    fontWeight: null as number | null,
-    transitionDuration: null as number | null,
-    paddingVertical: null as number | null,
-    paddingHorizontal: null as number | null,
-  });
+  // 현재 선택된 버튼의 override 키 생성
+  const currentButtonKey = `${selectedSize}_${selectedVariant}`;
+  const currentOverride = buttonOverrides[currentButtonKey] || {};
 
   // 버튼 사이즈 정의
   const buttonSizes = [
@@ -464,7 +482,7 @@ export default function ButtonPage() {
                           size.fontSize,
                           size.padding,
                           true,
-                          primaryOverride
+                          currentOverride
                         )}
                         style={{ minWidth: size.minWidth, width: size.width }}
                       >
@@ -478,7 +496,7 @@ export default function ButtonPage() {
                           size.fontSize,
                           size.padding,
                           false,
-                          secondaryOverride
+                          currentOverride
                         )}
                         style={{ 
                           border: `1px solid ${secondaryColors.borderColor}`,
@@ -723,7 +741,7 @@ export default function ButtonPage() {
                 <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#0aa5ff', marginBottom: '8px', textTransform: 'uppercase' }}>
                   Override Shared Tokens
                 </label>
-                {Object.entries(primaryOverride).map(([key, value]) => {
+                {Object.entries(currentOverride).map(([key, value]) => {
                   const config = tokenConfig[key];
                   return (
                     <div key={key} css={tokenInputGroupStyle}>
@@ -733,14 +751,17 @@ export default function ButtonPage() {
                           type="number"
                           value={value ?? ''}
                           onChange={(e) =>
-                            setPrimaryOverride({
-                              ...primaryOverride,
-                              [key]: e.target.value ? parseInt(e.target.value) : null,
+                            setButtonOverrides({
+                              ...buttonOverrides,
+                              [currentButtonKey]: {
+                                ...currentOverride,
+                                [key]: e.target.value ? parseInt(e.target.value) : null,
+                              },
                             })
                           }
                           onKeyDown={(e) => {
                             if (value !== null) {
-                              handleKeyboardNav(e, key, value, setPrimaryOverride, config);
+                              handleKeyboardNav(e, key, value, setButtonOverrides, config);
                             }
                           }}
                           step={config.step}
@@ -815,7 +836,7 @@ export default function ButtonPage() {
                 <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', color: '#0aa5ff', marginBottom: '8px', textTransform: 'uppercase' }}>
                   Override Shared Tokens
                 </label>
-                {Object.entries(secondaryOverride).map(([key, value]) => {
+                {Object.entries(currentOverride).map(([key, value]) => {
                   const config = tokenConfig[key];
                   return (
                     <div key={key} css={tokenInputGroupStyle}>
@@ -825,14 +846,17 @@ export default function ButtonPage() {
                           type="number"
                           value={value ?? ''}
                           onChange={(e) =>
-                            setSecondaryOverride({
-                              ...secondaryOverride,
-                              [key]: e.target.value ? parseInt(e.target.value) : null,
+                            setButtonOverrides({
+                              ...buttonOverrides,
+                              [currentButtonKey]: {
+                                ...currentOverride,
+                                [key]: e.target.value ? parseInt(e.target.value) : null,
+                              },
                             })
                           }
                           onKeyDown={(e) => {
                             if (value !== null) {
-                              handleKeyboardNav(e, key, value, setSecondaryOverride, config);
+                              handleKeyboardNav(e, key, value, setButtonOverrides, config);
                             }
                           }}
                           step={config.step}

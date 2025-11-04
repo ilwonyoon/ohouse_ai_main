@@ -63,14 +63,14 @@ export namespace PrimitiveTokens {
   }
 
   export namespace Spacing {
-    export const XS = '2px';
-    export const SM = '4px';
-    export const MD = '6px';
-    export const LG = '8px';
-    export const XL = '10px';
-    export const XXL = '12px';
-    export const XXXL = '16px';
-    export const HUGE = '20px';
+    export const MICRO = '2px';
+    export const EXTRA_SMALL = '4px';
+    export const SMALL = '8px';
+    export const MEDIUM_SMALL = '12px';
+    export const MEDIUM = '16px';
+    export const MEDIUM_LARGE = '20px';
+    export const LARGE = '24px';
+    export const EXTRA_LARGE = '32px';
   }
 
   export namespace BorderRadius {
@@ -200,17 +200,44 @@ export namespace SemanticTokens {
   }
 
   export namespace Spacing {
+    export namespace Horizontal {
+      export const PAGE_EDGE = '16px';
+      export const ELEMENT_SPACING = '12px';
+      export const CONTENT_WIDTH = '343px';
+    }
+
+    export namespace Vertical {
+      export const SECTION_SPACING = '20px';
+      export const CARD_SPACING = '12px';
+      export const TITLE_TO_CONTENT = '8px';
+      export const CONTENT_LINES = '4px';
+    }
+
+    export namespace SafeArea {
+      export const TOP = '48px';
+      export const BOTTOM = '88.5px';
+      export const HORIZONTAL = '16px';
+    }
+
     export namespace Component {
       export namespace Padding {
+        export const MICRO = '2px';
         export const COMPACT = '4px';
         export const TIGHT = '8px';
-        export const DEFAULT = '10px';
-        export const LOOSE = '12px';
+        export const DEFAULT = '12px';
+        export const MEDIUM = '16px';
+        export const LOOSE = '20px';
       }
 
       export namespace Margin {
         export const DEFAULT = '16px';
         export const LARGE = '20px';
+      }
+
+      export namespace Gap {
+        export const ICON_TEXT = '4px';
+        export const ELEMENT = '12px';
+        export const SECTION = '20px';
       }
     }
   }

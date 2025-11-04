@@ -1,0 +1,250 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║           🚀 OHOUSE AI DESIGN SYSTEM - GETTING STARTED GUIDE             ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+Created: November 4, 2025
+Design System Version: 1.0
+Source: Figma (node-id: 11815-20728)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTATION FILES CREATED:
+
+1. INDEX.md
+   → Navigation hub for all design documentation
+   → Start here for role-specific guides
+
+2. DESIGN_SYSTEM.md
+   → Complete design specifications
+   → Primitive & semantic tokens
+   → Component specifications
+
+3. DESIGN_SYSTEM_README.md
+   → Integration guide
+   → Adding new screens checklist
+
+4. DESIGN_SYSTEM_STRUCTURE.md
+   → Visual token hierarchy
+   → Organization overview
+
+5. TOKENS_QUICK_REFERENCE.md
+   → Quick lookup guide for developers
+   → Copy-paste component templates
+
+6. tokens.ts
+   → TypeScript definitions
+   → Ready to import in React/Next.js
+
+7. tokens.json
+   → Machine-readable token data
+   → For design tool integration
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 QUICK START BY ROLE:
+
+👨‍💻 DEVELOPER:
+   1. Read: docs/TOKENS_QUICK_REFERENCE.md
+   2. Import: import { SemanticTokens } from '@/docs/tokens'
+   3. Use: SemanticTokens.Color.Background.DEFAULT
+   4. Reference: DESIGN_SYSTEM.md for details
+
+🎨 DESIGNER:
+   1. Read: docs/DESIGN_SYSTEM.md
+   2. Review: Component Specifications section
+   3. Check: TOKENS_QUICK_REFERENCE.md for patterns
+   4. Reference: Exact pixel/color values
+
+📋 PRODUCT MANAGER:
+   1. Start: docs/INDEX.md
+   2. Review: docs/DESIGN_SYSTEM.md (full overview)
+   3. Process: docs/DESIGN_SYSTEM_README.md (adding screens)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 DESIGN SYSTEM OVERVIEW:
+
+Primitive Tokens:       32 base design values
+Semantic Tokens:        20 contextual uses
+Component Specs:        7 components
+Total Coverage:         Complete Figma design (11815:20728)
+
+Colors:      6 (White, Dark Charcoal, Gray, Cyan, Borders)
+Typography: 13 (Font families, weights, sizes, line heights)
+Spacing:     8 (2px to 20px, 8px base unit)
+Radius:      3 (8px, 12px, 100px)
+Blur:        2 (2px, 25px)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎨 COLOR PALETTE:
+
+Primary:     #2F3438 (Dark Charcoal - text, buttons)
+Secondary:   #828C94 (Medium Gray - descriptions)
+Background:  #FFFFFF (White)
+Accent:      #0AA5FF (Cyan Blue - brand, active states)
+Border:      #E6E6E6 (Border Gray - default)
+Border Alt:  #DADDE0 (Light Border)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔤 TYPOGRAPHY:
+
+Font: Pretendard (weights: 400, 500, 600, 700)
+
+Heading:     17px / 600 weight / 26px line height
+Body Large:  16px / 700 weight / 20px line height
+Body Default: 15px / 600 weight / 24px line height
+Body Regular: 14px / 400 weight / 18px line height
+Body Medium: 14px / 500 weight / 20px line height
+Detail:      10-13px / 400-700 weight / 14-18px line height
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📏 SPACING SCALE (8px base unit):
+
+xs:    2px  (borders, dividers)
+sm:    4px  (compact spacing)
+md:    6px  (tight spacing)
+lg:    8px  (default padding)
+xl:    10px (card padding)
+xxl:   12px (section gap)
+xxxl:  16px (margins)
+huge:  20px (large spacing)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🧩 COMPONENTS DOCUMENTED:
+
+Navigation:
+  • Top Navigation Bar (44px height)
+  • Tab Navigation (44px height)
+  • Bottom Navigation (88.5px height)
+
+Cards:
+  • Feature Card Large (351×263px)
+  • Feature Card Small (167×250px)
+
+Other:
+  • Primary Button (47×28px)
+  • Image Badge (40×18px)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📍 FIGMA FRAMES EXTRACTED:
+
+Source: https://www.figma.com/design/k7C6jxlWGJaz8j0k9a2Wjb/Ohouse-AI--AI-interior-
+
+Main Frame:          11815:20728 (Initial Design Screen)
+Status Bar:          11815:20775
+Top Navigation:      11815:20773
+Tab Navigation:      11815:20729
+Feature Card Large:  11815:20730, 11815:20933
+Feature Card Small:  11815:20894, 11815:20915, 11815:20921, 11815:20927
+Bottom Navigation:   11815:20777
+
+Total Components Extracted: 11
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 IMPLEMENTATION EXAMPLE:
+
+TypeScript/React Usage:
+
+    import { SemanticTokens, ComponentTokens } from '@/docs/tokens';
+
+    const Card = () => (
+      <div style={{
+        background: SemanticTokens.Color.Background.DEFAULT,
+        border: `0.5px solid ${SemanticTokens.Color.Border.DEFAULT}`,
+        borderRadius: SemanticTokens.Radius.CARD,
+        padding: SemanticTokens.Spacing.Component.Padding.DEFAULT
+      }}>
+        <h2 style={{
+          fontSize: SemanticTokens.Typography.Body.DEFAULT.fontSize,
+          fontWeight: SemanticTokens.Typography.Body.DEFAULT.fontWeight,
+          color: SemanticTokens.Color.Foreground.DEFAULT
+        }}>
+          Card Title
+        </h2>
+        <p style={{
+          fontSize: SemanticTokens.Typography.Detail.MEDIUM.fontSize,
+          color: SemanticTokens.Color.Foreground.SECONDARY
+        }}>
+          Card description
+        </p>
+      </div>
+    );
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📋 ADDING NEW DESIGNS:
+
+Step 1: Extract from Figma using MCP
+Step 2: Document components in DESIGN_SYSTEM.md
+Step 3: Add tokens to tokens.json and tokens.ts
+Step 4: Update Figma References table
+
+Time per screen: 30-45 minutes
+
+Full process: See docs/DESIGN_SYSTEM_README.md
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ WHAT YOU CAN DO NOW:
+
+✓ Import design tokens in React/Next.js components
+✓ Use TypeScript definitions for type safety
+✓ Reference exact component specifications
+✓ Add new Figma designs following the checklist
+✓ Integrate with design tools and plugins
+✓ Generate CSS variables from tokens.json
+✓ Share token definitions with your team
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📞 NEED HELP?
+
+Question                          Reference File
+─────────────────────────────────────────────────────
+How do I use tokens in code?      TOKENS_QUICK_REFERENCE.md
+What's the exact hex code?        DESIGN_SYSTEM.md
+How do I add a new screen?        DESIGN_SYSTEM_README.md
+Where's the structure explained?  DESIGN_SYSTEM_STRUCTURE.md
+Which file does what?             INDEX.md
+I need the data format            tokens.json
+I need TypeScript types           tokens.ts
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📁 FILE LOCATIONS:
+
+All design system files are in: /docs/
+
+  • INDEX.md                    (Start here)
+  • DESIGN_SYSTEM.md            (Complete specs)
+  • TOKENS_QUICK_REFERENCE.md   (Developer guide)
+  • DESIGN_SYSTEM_README.md     (Setup & expansion)
+  • DESIGN_SYSTEM_STRUCTURE.md  (Architecture)
+  • tokens.ts                   (TypeScript)
+  • tokens.json                 (Data)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 DESIGN SYSTEM GOALS:
+
+✅ Consistency   - Single source of truth
+✅ Type Safety   - TypeScript definitions
+✅ Scalability   - Easy to expand
+✅ Accessibility - WCAG compliant
+✅ Documentation - Comprehensive reference
+✅ Integration   - Works with all tools
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Version: 1.0
+Status: ✅ Complete & Ready for Use
+Last Updated: November 4, 2025
+Maintained by: Design System Team
+
+═══════════════════════════════════════════════════════════════════════════════

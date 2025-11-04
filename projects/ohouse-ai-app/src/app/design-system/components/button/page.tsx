@@ -919,15 +919,10 @@ export default function ButtonPage() {
                           value={value ?? ''}
                           onChange={(e) => {
                             const newValue = e.target.value ? parseInt(e.target.value) : null;
-                            
-                            // 패딩 좌우/상하 동기화
-                            let updatedOverride = { ...currentOverride, [key]: newValue };
-                            if (key === 'paddingLeft' || key === 'paddingRight') {
-                              updatedOverride = { ...updatedOverride, paddingLeft: newValue, paddingRight: newValue };
-                            } else if (key === 'paddingTop' || key === 'paddingBottom') {
-                              updatedOverride = { ...updatedOverride, paddingTop: newValue, paddingBottom: newValue };
-                            }
-                            
+
+                            // Override each token independently - no forced synchronization
+                            const updatedOverride = { ...currentOverride, [key]: newValue };
+
                             setButtonOverrides({
                               ...buttonOverrides,
                               [currentButtonKey]: updatedOverride,
@@ -1021,15 +1016,10 @@ export default function ButtonPage() {
                           value={value ?? ''}
                           onChange={(e) => {
                             const newValue = e.target.value ? parseInt(e.target.value) : null;
-                            
-                            // 패딩 좌우/상하 동기화
-                            let updatedOverride = { ...currentOverride, [key]: newValue };
-                            if (key === 'paddingLeft' || key === 'paddingRight') {
-                              updatedOverride = { ...updatedOverride, paddingLeft: newValue, paddingRight: newValue };
-                            } else if (key === 'paddingTop' || key === 'paddingBottom') {
-                              updatedOverride = { ...updatedOverride, paddingTop: newValue, paddingBottom: newValue };
-                            }
-                            
+
+                            // Override each token independently - no forced synchronization
+                            const updatedOverride = { ...currentOverride, [key]: newValue };
+
                             setButtonOverrides({
                               ...buttonOverrides,
                               [currentButtonKey]: updatedOverride,

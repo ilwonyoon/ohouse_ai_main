@@ -10,6 +10,8 @@ const tokenConfig: Record<string, { step: number; suffix: string; min: number; m
   borderRadius: { step: 1, suffix: 'px', min: 0, max: 24 },
   fontWeight: { step: 100, suffix: '', min: 100, max: 900 },
   transitionDuration: { step: 50, suffix: 'ms', min: 0, max: 1000 },
+  paddingVertical: { step: 1, suffix: 'px', min: 0, max: 20 },
+  paddingHorizontal: { step: 1, suffix: 'px', min: 0, max: 40 },
 };
 
 const colorTokenConfig = {
@@ -25,6 +27,8 @@ export default function ButtonPage() {
     borderRadius: 8,
     fontWeight: 600,
     transitionDuration: 200,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
   });
 
   // Primary 버튼 컬러 토큰
@@ -55,6 +59,8 @@ export default function ButtonPage() {
     borderRadius: null as number | null,
     fontWeight: null as number | null,
     transitionDuration: null as number | null,
+    paddingVertical: null as number | null,
+    paddingHorizontal: null as number | null,
   });
 
   // Secondary override 토큰 (스타일 재정의용)
@@ -62,6 +68,8 @@ export default function ButtonPage() {
     borderRadius: null as number | null,
     fontWeight: null as number | null,
     transitionDuration: null as number | null,
+    paddingVertical: null as number | null,
+    paddingHorizontal: null as number | null,
   });
 
   // 버튼 사이즈 정의
@@ -69,8 +77,8 @@ export default function ButtonPage() {
     { name: 'Small', height: '28px', width: '72px', padding: '6px 12px', fontSize: '12px' },
     { name: 'Medium', height: '32px', width: '84px', padding: '8px 16px', fontSize: '13px' },
     { name: 'Default', height: '40px', width: '104px', padding: '10px 20px', fontSize: '14px' },
-    { name: 'Large', height: '44px', width: '116px', padding: '12px 24px', fontSize: '15px' },
-    { name: 'Extra Large', height: '50px', width: '140px', padding: '14px 28px', fontSize: '16px' },
+    { name: 'Large', height: '44px', minWidth: '280px', padding: '12px 24px', fontSize: '15px' },
+    { name: 'Extra Large', height: '50px', minWidth: '343px', padding: '14px 28px', fontSize: '16px' },
   ];
 
   // 레이아웃 스타일
@@ -202,7 +210,8 @@ export default function ButtonPage() {
     .buttons {
       display: flex;
       gap: 8px;
-      justify-content: flex-end;
+      justify-content: flex-start;
+      padding: 0 16px;
     }
   `;
 
@@ -296,16 +305,25 @@ export default function ButtonPage() {
     hoverBackgroundColor: string,
     fontSize: string,
     padding: string,
-    override?: { borderRadius?: number; fontWeight?: number; transitionDuration?: number }
+    isPrimary: boolean = true,
+    override?: { borderRadius?: number; fontWeight?: number; transitionDuration?: number; paddingVertical?: number; paddingHorizontal?: number }
   ) => {
-    const br = override?.borderRadius !== undefined ? override.borderRadius : sharedTokens.borderRadius;
-    const fw = override?.fontWeight !== undefined ? override.fontWeight : sharedTokens.fontWeight;
-    const td = override?.transitionDuration !== undefined ? override.transitionDuration : sharedTokens.transitionDuration;
-
+    const br = override?.borderRadius ?? sharedTokens.borderRadius;
+    const fw = override?.fontWeight ?? sharedTokens.fontWeight;
+    const td = override?.transitionDuration ?? sharedTokens.transitionDuration;
+    const pv = override?.paddingVertical ?? sharedTokens.paddingVertical;
+    const ph = override?.paddingHorizontal ?? sharedTokens.paddingHorizontal;
+    
+    // 선택된 색상 토큰 사용 (primary/secondary에 따라)
+    const colors = isPrimary ? primaryColors : secondaryColors;
+    
+    // 동적 padding 생성
+    const dynamicPadding = `${pv}px ${ph}px`;
+    
     return css`
-      padding: ${padding};
-      background-color: ${backgroundColor};
-      color: ${textColor};
+      padding: ${dynamicPadding};
+      background-color: ${isPrimary ? colors.backgroundColor : backgroundColor};
+      color: ${isPrimary ? colors.textColor : textColor};
       border: none;
       border-radius: ${br}px;
       font-size: ${fontSize};
@@ -315,7 +333,7 @@ export default function ButtonPage() {
       transition: all ${td}ms ease-out;
 
       &:hover {
-        background-color: ${hoverBackgroundColor};
+        background-color: ${isPrimary ? colors.hoverBackgroundColor : hoverBackgroundColor};
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
       }
 
@@ -324,7 +342,7 @@ export default function ButtonPage() {
       }
 
       &:focus-visible {
-        outline: 2px solid ${backgroundColor};
+        outline: 2px solid ${isPrimary ? colors.backgroundColor : backgroundColor};
         outline-offset: 2px;
       }
     `;
@@ -350,7 +368,7 @@ export default function ButtonPage() {
     }
   };
 
-  const [expandedSections, setExpandedSections] = useState<string[]>(['shared', 'primary']);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['shared']);
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) =>
@@ -371,39 +389,51 @@ export default function ButtonPage() {
           <h2>Button Sizes</h2>
           <ComponentPreview>
             <div css={sizeGridStyle}>
-              {buttonSizes.map((size) => (
-                <div key={size.name} css={sizeButtonContainerStyle}>
-                  <div className="label">{size.name}</div>
-                  <div className="spec">H: {size.height} × W: {size.width}</div>
-                  <div className="buttons">
-                    <button
-                      css={createButtonStyle(
-                        primaryColors.backgroundColor,
-                        primaryColors.textColor,
-                        primaryColors.hoverBackgroundColor,
-                        size.fontSize,
-                        size.padding,
-                        primaryOverride
-                      )}
-                    >
-                      {size.name}
-                    </button>
-                    <button
-                      css={createButtonStyle(
-                        secondaryColors.backgroundColor,
-                        secondaryColors.textColor,
-                        secondaryColors.hoverBackgroundColor,
-                        size.fontSize,
-                        size.padding,
-                        secondaryOverride
-                      )}
-                      style={{ border: `1px solid ${secondaryColors.borderColor}` }}
-                    >
-                      {size.name}
-                    </button>
+              {buttonSizes.map((size) => {
+                const displayWidth = size.minWidth || size.width;
+                const widthDisplay = size.minWidth ? `Min: ${size.minWidth}` : `W: ${displayWidth}`;
+                
+                return (
+                  <div key={size.name} css={sizeButtonContainerStyle}>
+                    <div className="label">{size.name}</div>
+                    <div className="spec">H: {size.height} × {widthDisplay}</div>
+                    <div className="buttons">
+                      <button
+                        css={createButtonStyle(
+                          primaryColors.backgroundColor,
+                          primaryColors.textColor,
+                          primaryColors.hoverBackgroundColor,
+                          size.fontSize,
+                          size.padding,
+                          true,
+                          primaryOverride
+                        )}
+                        style={{ minWidth: size.minWidth, width: size.width }}
+                      >
+                        {size.name}
+                      </button>
+                      <button
+                        css={createButtonStyle(
+                          secondaryColors.backgroundColor,
+                          secondaryColors.textColor,
+                          secondaryColors.hoverBackgroundColor,
+                          size.fontSize,
+                          size.padding,
+                          false,
+                          secondaryOverride
+                        )}
+                        style={{ 
+                          border: `1px solid ${secondaryColors.borderColor}`,
+                          minWidth: size.minWidth,
+                          width: size.width
+                        }}
+                      >
+                        {size.name}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </ComponentPreview>
         </div>
@@ -482,7 +512,7 @@ export default function ButtonPage() {
 
       {/* Right Panel Editor */}
       <div css={rightPanelStyle}>
-        <h3>Token Editor</h3>
+        <h3>Style Editor</h3>
 
         {/* Shared Tokens */}
         <div css={tokenGroupStyle}>
@@ -660,7 +690,7 @@ export default function ButtonPage() {
                       value={value}
                       onChange={(e) =>
                         setSecondaryColors({ ...secondaryColors, [key]: e.target.value })
-                      }
+                    }
                       style={{ flex: 1, height: '36px', borderRadius: '6px', border: '1px solid #e6e6e6', cursor: 'pointer' }}
                     />
                     <input

@@ -169,7 +169,28 @@ export interface ConsultationContext {
   conversationQualityScore?: number;
 }
 
-export type ConsultationPhase = "intent_detection" | "scope_clarification" | "light_consultation" | "standard_consultation" | "synthesis";
+// Phase system based on Claude skill
+export type ConsultationPhase =
+  | "phase_0_intent_detection"          // Detect user intent and classify
+  | "phase_1a_exploratory_mode"         // For tire-kickers: fun, visual, low-pressure
+  | "phase_1b_scope_clarification"      // Understand project scope
+  | "phase_1c_light_consultation"       // Small refresh projects (5-8 questions)
+  | "phase_1d_standard_consultation"    // Medium/large projects (comprehensive)
+  | "phase_2_rapport_building"          // (Part of standard)
+  | "phase_3_project_context"           // (Part of standard)
+  | "phase_4_functional_requirements"   // (Part of standard)
+  | "phase_5_budget_discovery"          // (Part of standard)
+  | "phase_6_scope_timeline"            // (Part of standard)
+  | "phase_7_additional_discovery"      // (Part of standard)
+  | "phase_8_synthesis";                // Prepare brief, confirm understanding
+
+// User classification for intent detection
+export type UserIntentType =
+  | "exploratory"           // Just curious, no real project
+  | "vague_interest"        // Mentions room but unclear scope
+  | "small_project"         // Clear small scope (refresh)
+  | "medium_project"        // Medium scope (makeover)
+  | "large_project";        // Large scope (renovation, full home)
 
 // ===== CONSULTATION BRIEF (Output for other agents) =====
 /**
@@ -252,6 +273,16 @@ export interface ConsultationStats {
 
 // ===== ASSISTANT RESPONSE STRUCTURE =====
 /**
+ * Option for multiple choice, range selection, etc.
+ */
+export interface AnswerOption {
+  id: string;
+  label: string;
+  description?: string;
+  nextPhaseIfSelected?: ConsultationPhase;
+}
+
+/**
  * Structured response from consultant assistant
  * Includes both conversational text and internal processing data
  */
@@ -263,13 +294,14 @@ export interface ConsultantResponse {
 
   // Internal processing
   processingData?: {
-    intentDetected?: ProjectScopeType;
+    intentDetected?: UserIntentType;
     scopeClarity: "clear" | "emerging" | "vague";
     informationGaps?: string[];
     conversionSignals?: string[];
   };
 
-  // For UI
+  // For UI - Question format hints
   questionType?: "open_ended" | "multiple_choice" | "range_selection" | "free_text";
   suggestedAnswers?: string[];
+  answerOptions?: AnswerOption[];
 }

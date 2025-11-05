@@ -106,6 +106,117 @@ export default function ButtonPage() {
   const currentButtonKey = `${selectedSize}_${selectedVariant}`;
   const currentOverride = buttonOverrides[currentButtonKey] || {};
 
+  const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+
+  const formatButtonKey = (key: string) => {
+    const [size, variant] = key.split('_');
+    const variantLabel = variant === 'primary' ? 'Primary' : 'Secondary';
+    return `${size} • ${variantLabel}`;
+  };
+
+  const setOverrideValue = (tokenKey: keyof ButtonOverride, newValue: number | null) => {
+    setButtonOverrides((prev) => {
+      const existing = prev[currentButtonKey] ?? {};
+      return {
+        ...prev,
+        [currentButtonKey]: {
+          ...existing,
+          [tokenKey]: newValue,
+        },
+      };
+    });
+  };
+
+  const activateOverride = (tokenKey: keyof ButtonOverride) => {
+    const sharedValue = sharedTokens[tokenKey as keyof typeof sharedTokens];
+    const numericValue = typeof sharedValue === 'number' ? sharedValue : 0;
+    setOverrideValue(tokenKey, numericValue);
+    setPendingOverrideToken(null);
+  };
+
+  const activatePaddingOverride = () => {
+    setButtonOverrides((prev) => {
+      const existing = prev[currentButtonKey] ?? {};
+      return {
+        ...prev,
+        [currentButtonKey]: {
+          ...existing,
+          paddingTop: sharedTokens.paddingTop,
+          paddingBottom: sharedTokens.paddingBottom,
+          paddingLeft: sharedTokens.paddingLeft,
+          paddingRight: sharedTokens.paddingRight,
+        },
+      };
+    });
+    setPendingOverrideToken(null);
+  };
+
+  const clearOverride = (tokenKey: keyof ButtonOverride) => {
+    setOverrideValue(tokenKey, null);
+  };
+
+  const clearPaddingOverride = () => {
+    setButtonOverrides((prev) => {
+      const existing = prev[currentButtonKey] ?? {};
+      return {
+        ...prev,
+        [currentButtonKey]: {
+          ...existing,
+          paddingTop: null,
+          paddingBottom: null,
+          paddingLeft: null,
+          paddingRight: null,
+        },
+      };
+    });
+  };
+
+  const updateOverrideToken = (tokenKey: keyof ButtonOverride, newValue: number) => {
+    setButtonOverrides((prev) => {
+      const existing = prev[currentButtonKey] ?? {};
+      const updated: ButtonOverride = {
+        ...existing,
+      };
+
+      if (tokenKey === 'paddingLeft' || tokenKey === 'paddingRight') {
+        updated.paddingLeft = newValue;
+        updated.paddingRight = newValue;
+      } else if (tokenKey === 'paddingTop' || tokenKey === 'paddingBottom') {
+        updated.paddingTop = newValue;
+        updated.paddingBottom = newValue;
+      } else {
+        updated[tokenKey] = newValue;
+      }
+
+      return {
+        ...prev,
+        [currentButtonKey]: updated,
+      };
+    });
+  };
+
+  const updateOverridePadding = (direction: 'horizontal' | 'vertical', newValue: number) => {
+    setButtonOverrides((prev) => {
+      const existing = prev[currentButtonKey] ?? {};
+      const updated: ButtonOverride = {
+        ...existing,
+      };
+
+      if (direction === 'horizontal') {
+        updated.paddingLeft = newValue;
+        updated.paddingRight = newValue;
+      } else {
+        updated.paddingTop = newValue;
+        updated.paddingBottom = newValue;
+      }
+
+      return {
+        ...prev,
+        [currentButtonKey]: updated,
+      };
+    });
+  };
+
   // 버튼 사이즈 정의
   const buttonSizes = [
     { name: 'Small', height: '28px', width: '72px', padding: '6px 12px', fontSize: '12px' },
@@ -717,11 +828,76 @@ export default function ButtonPage() {
                 if (key.startsWith('padding')) {
                   // Padding 그룹은 첫 번째 padding 필드에서만 렌더링
                   if (key === 'paddingTop') {
+                    const isPaddingOverrideActive = currentOverride.paddingTop !== null;
+                    const paddingTopValue = isPaddingOverrideActive && currentOverride.paddingTop !== null ? currentOverride.paddingTop : sharedTokens.paddingTop;
+                    const paddingBottomValue = isPaddingOverrideActive && currentOverride.paddingBottom !== null ? currentOverride.paddingBottom : sharedTokens.paddingBottom;
+                    const paddingLeftValue = isPaddingOverrideActive && currentOverride.paddingLeft !== null ? currentOverride.paddingLeft : sharedTokens.paddingLeft;
+                    const paddingRightValue = isPaddingOverrideActive && currentOverride.paddingRight !== null ? currentOverride.paddingRight : sharedTokens.paddingRight;
+
                     return (
                       <div key="padding-group" style={{ marginBottom: '16px' }}>
                         <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#2f3438', marginBottom: '8px', textTransform: 'capitalize' }}>
                           Padding
                         </label>
+
+                        {isButtonSelected && (
+                          <div
+                            style={{
+                              marginBottom: '12px',
+                              padding: '8px 10px',
+                              borderRadius: '6px',
+                              border: '1px solid ' + (isPaddingOverrideActive ? '#0aa5ff' : '#ffd24d'),
+                              backgroundColor: isPaddingOverrideActive ? '#f0f8ff' : '#fffbf0',
+                              fontSize: '11px',
+                              color: isPaddingOverrideActive ? '#005999' : '#7a5c00',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              gap: '12px',
+                              flexWrap: 'wrap',
+                            }}
+                          >
+                            <span style={{ flex: '1 1 auto', minWidth: '200px' }}>
+                              {isPaddingOverrideActive
+                                ? `Overriding padding for ${selectedSize} • ${selectedVariant === 'primary' ? 'Primary' : 'Secondary'}.`
+                                : 'Global padding applies to all buttons. Create a per-button override?'}
+                            </span>
+                            {isPaddingOverrideActive ? (
+                              <button
+                                onClick={clearPaddingOverride}
+                                style={{
+                                  padding: '6px 10px',
+                                  backgroundColor: '#0aa5ff',
+                                  color: '#ffffff',
+                                  border: 'none',
+                                  borderRadius: '4px',
+                                  fontSize: '11px',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Revert to shared ({sharedTokens.paddingTop}px/{sharedTokens.paddingLeft}px)
+                              </button>
+                            ) : (
+                              <button
+                                onClick={activatePaddingOverride}
+                                style={{
+                                  padding: '6px 10px',
+                                  backgroundColor: '#ffd24d',
+                                  color: '#4a3800',
+                                  border: 'none',
+                                  borderRadius: '4px',
+                                  fontSize: '11px',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Override for {selectedSize}
+                              </button>
+                            )}
+                          </div>
+                        )}
+
                         {/* Padding visual representation */}
                         <div style={{
                           display: 'grid',
@@ -739,9 +915,28 @@ export default function ButtonPage() {
                               <span style={{ fontSize: '11px', color: '#828c94' }}>↑</span>
                               <input
                                 type="number"
-                                value={sharedTokens.paddingTop}
-                                onChange={(e) => handleSharedTokenChange('paddingTop', parseInt(e.target.value) || 0)}
-                                onKeyDown={(e) => handleKeyboardNav(e, 'paddingTop', sharedTokens.paddingTop, setSharedTokens, tokenConfig.paddingTop)}
+                                value={paddingTopValue}
+                                onChange={(e) => {
+                                  const parsed = parseInt(e.target.value, 10);
+                                  const nextValue = Number.isNaN(parsed) ? 0 : parsed;
+                                  if (isPaddingOverrideActive) {
+                                    updateOverridePadding('vertical', clamp(nextValue, tokenConfig.paddingTop.min, tokenConfig.paddingTop.max));
+                                  } else {
+                                    handleSharedTokenChange('paddingTop', clamp(nextValue, tokenConfig.paddingTop.min, tokenConfig.paddingTop.max));
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (isPaddingOverrideActive) {
+                                    const baseValue = paddingTopValue;
+                                    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                                      e.preventDefault();
+                                      const delta = e.key === 'ArrowUp' ? tokenConfig.paddingTop.step : -tokenConfig.paddingTop.step;
+                                      updateOverridePadding('vertical', clamp(baseValue + delta, tokenConfig.paddingTop.min, tokenConfig.paddingTop.max));
+                                    }
+                                  } else {
+                                    handleKeyboardNav(e, 'paddingTop', sharedTokens.paddingTop, setSharedTokens, tokenConfig.paddingTop);
+                                  }
+                                }}
                                 step={tokenConfig.paddingTop.step}
                                 min={tokenConfig.paddingTop.min}
                                 max={tokenConfig.paddingTop.max}
@@ -764,9 +959,28 @@ export default function ButtonPage() {
                             <span style={{ fontSize: '11px', color: '#828c94' }}>←</span>
                             <input
                               type="number"
-                              value={sharedTokens.paddingLeft}
-                              onChange={(e) => handleSharedTokenChange('paddingLeft', parseInt(e.target.value) || 0)}
-                              onKeyDown={(e) => handleKeyboardNav(e, 'paddingLeft', sharedTokens.paddingLeft, setSharedTokens, tokenConfig.paddingLeft)}
+                              value={paddingLeftValue}
+                              onChange={(e) => {
+                                const parsed = parseInt(e.target.value, 10);
+                                const nextValue = Number.isNaN(parsed) ? 0 : parsed;
+                                if (isPaddingOverrideActive) {
+                                  updateOverridePadding('horizontal', clamp(nextValue, tokenConfig.paddingLeft.min, tokenConfig.paddingLeft.max));
+                                } else {
+                                  handleSharedTokenChange('paddingLeft', clamp(nextValue, tokenConfig.paddingLeft.min, tokenConfig.paddingLeft.max));
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (isPaddingOverrideActive) {
+                                  const baseValue = paddingLeftValue;
+                                  if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                                    e.preventDefault();
+                                    const delta = e.key === 'ArrowUp' ? tokenConfig.paddingLeft.step : -tokenConfig.paddingLeft.step;
+                                    updateOverridePadding('horizontal', clamp(baseValue + delta, tokenConfig.paddingLeft.min, tokenConfig.paddingLeft.max));
+                                  }
+                                } else {
+                                  handleKeyboardNav(e, 'paddingLeft', sharedTokens.paddingLeft, setSharedTokens, tokenConfig.paddingLeft);
+                                }
+                              }}
                               step={tokenConfig.paddingLeft.step}
                               min={tokenConfig.paddingLeft.min}
                               max={tokenConfig.paddingLeft.max}
@@ -786,9 +1000,28 @@ export default function ButtonPage() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
                             <input
                               type="number"
-                              value={sharedTokens.paddingRight}
-                              onChange={(e) => handleSharedTokenChange('paddingRight', parseInt(e.target.value) || 0)}
-                              onKeyDown={(e) => handleKeyboardNav(e, 'paddingRight', sharedTokens.paddingRight, setSharedTokens, tokenConfig.paddingRight)}
+                              value={paddingRightValue}
+                              onChange={(e) => {
+                                const parsed = parseInt(e.target.value, 10);
+                                const nextValue = Number.isNaN(parsed) ? 0 : parsed;
+                                if (isPaddingOverrideActive) {
+                                  updateOverridePadding('horizontal', clamp(nextValue, tokenConfig.paddingRight.min, tokenConfig.paddingRight.max));
+                                } else {
+                                  handleSharedTokenChange('paddingRight', clamp(nextValue, tokenConfig.paddingRight.min, tokenConfig.paddingRight.max));
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (isPaddingOverrideActive) {
+                                  const baseValue = paddingRightValue;
+                                  if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                                    e.preventDefault();
+                                    const delta = e.key === 'ArrowUp' ? tokenConfig.paddingRight.step : -tokenConfig.paddingRight.step;
+                                    updateOverridePadding('horizontal', clamp(baseValue + delta, tokenConfig.paddingRight.min, tokenConfig.paddingRight.max));
+                                  }
+                                } else {
+                                  handleKeyboardNav(e, 'paddingRight', sharedTokens.paddingRight, setSharedTokens, tokenConfig.paddingRight);
+                                }
+                              }}
                               step={tokenConfig.paddingRight.step}
                               min={tokenConfig.paddingRight.min}
                               max={tokenConfig.paddingRight.max}
@@ -812,9 +1045,28 @@ export default function ButtonPage() {
                               <span style={{ fontSize: '11px', color: '#828c94' }}>↓</span>
                               <input
                                 type="number"
-                                value={sharedTokens.paddingBottom}
-                                onChange={(e) => handleSharedTokenChange('paddingBottom', parseInt(e.target.value) || 0)}
-                                onKeyDown={(e) => handleKeyboardNav(e, 'paddingBottom', sharedTokens.paddingBottom, setSharedTokens, tokenConfig.paddingBottom)}
+                                value={paddingBottomValue}
+                                onChange={(e) => {
+                                  const parsed = parseInt(e.target.value, 10);
+                                  const nextValue = Number.isNaN(parsed) ? 0 : parsed;
+                                  if (isPaddingOverrideActive) {
+                                    updateOverridePadding('vertical', clamp(nextValue, tokenConfig.paddingBottom.min, tokenConfig.paddingBottom.max));
+                                  } else {
+                                    handleSharedTokenChange('paddingBottom', clamp(nextValue, tokenConfig.paddingBottom.min, tokenConfig.paddingBottom.max));
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (isPaddingOverrideActive) {
+                                    const baseValue = paddingBottomValue;
+                                    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                                      e.preventDefault();
+                                      const delta = e.key === 'ArrowUp' ? tokenConfig.paddingBottom.step : -tokenConfig.paddingBottom.step;
+                                      updateOverridePadding('vertical', clamp(baseValue + delta, tokenConfig.paddingBottom.min, tokenConfig.paddingBottom.max));
+                                    }
+                                  } else {
+                                    handleKeyboardNav(e, 'paddingBottom', sharedTokens.paddingBottom, setSharedTokens, tokenConfig.paddingBottom);
+                                  }
+                                }}
                                 step={tokenConfig.paddingBottom.step}
                                 min={tokenConfig.paddingBottom.min}
                                 max={tokenConfig.paddingBottom.max}
@@ -858,16 +1110,37 @@ export default function ButtonPage() {
                                 <span style={{ fontWeight: '600' }}>Exception: </span>
                                 {allPaddingExceptions.map((excBtn, idx) => {
                                   const paddingValues: string[] = [];
-                                  if (paddingExceptions.top.includes(excBtn)) paddingValues.push(`T:${buttonOverrides[excBtn].paddingTop}`);
-                                  if (paddingExceptions.right.includes(excBtn)) paddingValues.push(`R:${buttonOverrides[excBtn].paddingRight}`);
-                                  if (paddingExceptions.bottom.includes(excBtn)) paddingValues.push(`B:${buttonOverrides[excBtn].paddingBottom}`);
-                                  if (paddingExceptions.left.includes(excBtn)) paddingValues.push(`L:${buttonOverrides[excBtn].paddingLeft}`);
+                                  const overrideRecord = buttonOverrides[excBtn];
+                                  if (paddingExceptions.top.includes(excBtn)) paddingValues.push(`T:${typeof overrideRecord.paddingTop === 'number' ? overrideRecord.paddingTop : '—'}`);
+                                  if (paddingExceptions.right.includes(excBtn)) paddingValues.push(`R:${typeof overrideRecord.paddingRight === 'number' ? overrideRecord.paddingRight : '—'}`);
+                                  if (paddingExceptions.bottom.includes(excBtn)) paddingValues.push(`B:${typeof overrideRecord.paddingBottom === 'number' ? overrideRecord.paddingBottom : '—'}`);
+                                  if (paddingExceptions.left.includes(excBtn)) paddingValues.push(`L:${typeof overrideRecord.paddingLeft === 'number' ? overrideRecord.paddingLeft : '—'}`);
+
+                                  const [size, variant] = excBtn.split('_');
+                                  const handleExceptionClick = () => {
+                                    setSelectedSize(size);
+                                    setSelectedVariant(variant as 'primary' | 'secondary');
+                                    setIsButtonSelected(true);
+                                  };
 
                                   return (
-                                    <span key={idx}>
-                                      {excBtn} <strong>({paddingValues.join(', ')})</strong>
+                                    <button
+                                      key={idx}
+                                      onClick={handleExceptionClick}
+                                      style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: '0',
+                                        cursor: 'pointer',
+                                        color: '#0066cc',
+                                        textDecoration: 'underline',
+                                        fontSize: '10px',
+                                        fontWeight: idx === 0 ? '400' : '400',
+                                      }}
+                                    >
+                                          {formatButtonKey(excBtn)} <strong>({paddingValues.join(', ')})</strong>
                                       {idx < allPaddingExceptions.length - 1 ? ', ' : ''}
-                                    </span>
+                                    </button>
                                   );
                                 })}
                               </div>
@@ -885,6 +1158,11 @@ export default function ButtonPage() {
                 // 일반 토큰 필드
                 const config = tokenConfig[key];
                 const exceptions = getExceptions(key);
+                const overrideKey = key as keyof ButtonOverride;
+                const supportsOverride = Object.prototype.hasOwnProperty.call(currentOverride, overrideKey);
+                const overrideValue = supportsOverride ? currentOverride[overrideKey] : null;
+                const isOverrideActive = Boolean(isButtonSelected && supportsOverride && overrideValue !== null);
+                const effectiveValue = isOverrideActive && typeof overrideValue === 'number' ? overrideValue : value;
 
                 return (
                   <div key={key} css={tokenInputGroupStyle}>
@@ -892,13 +1170,29 @@ export default function ButtonPage() {
                     <div className="input-wrapper">
                       <input
                         type="number"
-                        value={value}
-                        onChange={(e) =>
-                          handleSharedTokenChange(key as keyof typeof sharedTokens, parseInt(e.target.value) || 0)
-                        }
-                        onKeyDown={(e) =>
-                          handleKeyboardNav(e, key, value, setSharedTokens, config)
-                        }
+                        value={effectiveValue}
+                        onChange={(e) => {
+                          const parsed = parseInt(e.target.value, 10);
+                          const nextValue = Number.isNaN(parsed) ? 0 : parsed;
+
+                          if (isOverrideActive) {
+                            updateOverrideToken(overrideKey, clamp(nextValue, config.min, config.max));
+                          } else {
+                            handleSharedTokenChange(key as keyof typeof sharedTokens, clamp(nextValue, config.min, config.max));
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (isOverrideActive) {
+                            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                              e.preventDefault();
+                              const delta = e.key === 'ArrowUp' ? config.step : -config.step;
+                              const nextValue = clamp(effectiveValue + delta, config.min, config.max);
+                              updateOverrideToken(overrideKey, nextValue);
+                            }
+                          } else {
+                            handleKeyboardNav(e, key, value, setSharedTokens, config);
+                          }
+                        }}
                         step={config.step}
                         min={config.min}
                         max={config.max}
@@ -907,10 +1201,69 @@ export default function ButtonPage() {
                       {config.suffix && <span className="input-suffix">{config.suffix}</span>}
                     </div>
 
+                    {/* Override guidance */}
+                    {isButtonSelected && supportsOverride && (
+                      <div
+                        style={{
+                          marginTop: '8px',
+                          padding: '8px 10px',
+                          borderRadius: '6px',
+                          border: '1px solid ' + (isOverrideActive ? '#0aa5ff' : '#ffd24d'),
+                          backgroundColor: isOverrideActive ? '#f0f8ff' : '#fffbf0',
+                          fontSize: '11px',
+                          color: isOverrideActive ? '#005999' : '#7a5c00',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          gap: '12px',
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        <span style={{ flex: '1 1 auto', minWidth: '180px' }}>
+                          {isOverrideActive
+                            ? `Overriding ${selectedSize} • ${selectedVariant === 'primary' ? 'Primary' : 'Secondary'}.`
+                            : 'Global setting. Update all buttons or create an override.'}
+                        </span>
+                        {isOverrideActive ? (
+                          <button
+                            onClick={() => clearOverride(overrideKey)}
+                            style={{
+                              padding: '6px 10px',
+                              backgroundColor: '#0aa5ff',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Revert to shared ({sharedTokens[overrideKey as keyof typeof sharedTokens]}{config.suffix})
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => activateOverride(overrideKey)}
+                            style={{
+                              padding: '6px 10px',
+                              backgroundColor: '#ffd24d',
+                              color: '#4a3800',
+                              border: 'none',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Override for {selectedSize}
+                          </button>
+                        )}
+                      </div>
+                    )}
+
                     {/* Exception 표시 */}
                     {exceptions.length > 0 && (
                       <div style={{
-                        marginTop: '6px',
+                        marginTop: '8px',
                         padding: '6px 8px',
                         backgroundColor: '#f0f8ff',
                         border: '1px solid #b3d9ff',
@@ -919,14 +1272,35 @@ export default function ButtonPage() {
                         color: '#0066cc',
                         lineHeight: '1.4',
                       }}>
-                        <span style={{ fontWeight: '600' }}>Exception: </span>
+                        <span style={{ fontWeight: '600' }}>Overrides: </span>
                         {exceptions.map((excBtn, idx) => {
-                          const overrideValue = buttonOverrides[excBtn][key as keyof typeof buttonOverrides[string]];
+                          const overrideRecord = buttonOverrides[excBtn];
+                          const overrideAmount = overrideRecord?.[overrideKey];
+                          const displayAmount = typeof overrideAmount === 'number' ? overrideAmount : '—';
+                          const handleExceptionClick = () => {
+                            const [size, variant] = excBtn.split('_');
+                            setSelectedSize(size);
+                            setSelectedVariant(variant as 'primary' | 'secondary');
+                            setIsButtonSelected(true);
+                          };
+
                           return (
-                            <span key={idx}>
-                              {excBtn} <strong>{overrideValue}{config.suffix}</strong>
+                            <button
+                              key={idx}
+                              onClick={handleExceptionClick}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                padding: '0',
+                                cursor: 'pointer',
+                                color: '#0066cc',
+                                textDecoration: 'underline',
+                                fontSize: '11px',
+                              }}
+                            >
+                              {formatButtonKey(excBtn)} → <strong>{displayAmount}{config.suffix}</strong>
                               {idx < exceptions.length - 1 ? ', ' : ''}
-                            </span>
+                            </button>
                           );
                         })}
                       </div>

@@ -5,6 +5,18 @@ import AppIcon from './AppIcon';
 
 const APPS = [
   {
+    name: 'AI Consultant',
+    icon: '💬',
+    href: '/ai-consultant',
+    description: 'Design consultation',
+  },
+  {
+    name: 'Design System',
+    icon: '🎨',
+    href: '/design-system',
+    description: 'UI components',
+  },
+  {
     name: 'Entry Revival',
     icon: '📝',
     href: '/feature_entry',

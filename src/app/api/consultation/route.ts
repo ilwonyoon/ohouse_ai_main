@@ -7,12 +7,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { extractMetadataFromMessage } from "@/api/metadataExtractor";
 import { consultationEngine } from "@/api/consultationEngine";
 import { generateBrief } from "@/api/briefGenerator";
-import { ExtractedMetadata, ConsultationMessage } from "@/types/consultation";
+import type { ExtractedMetadata } from "@/types/consultation";
 
 // ===== POST /api/consultation/process-message =====
 /**
  * Process user message and generate response
- * Extracts metadata, generates next question, tracks conversation state
+ * Task 2.A: Extracts metadata, detects conversion signals, manages phase transitions
+ *
+ * Request body:
+ * {
+ *   userMessage: string
+ *   consultationId: string
+ *   previousMetadata?: ExtractedMetadata
+ *   currentPhase?: string
+ *   messages?: ConsultationMessage[]
+ *   imageMetadata?: ImageMetadata
+ * }
  */
 export async function POST(request: NextRequest) {
   try {
@@ -21,91 +31,116 @@ export async function POST(request: NextRequest) {
       userMessage,
       consultationId,
       previousMetadata,
-      currentPhase,
-      messages,
+      currentPhase = "intent_detection",
+      messages = [],
+      imageMetadata,
     } = body;
 
+    // ===== VALIDATION =====
     if (!userMessage || !consultationId) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields: userMessage, consultationId" },
         { status: 400 }
       );
     }
 
-    // 1. Extract metadata from user message
-    const extractedMetadata = await extractMetadataFromMessage(
-      userMessage,
-      previousMetadata
-    );
+    // Check if this is a brief generation request
+    const url = new URL(request.url);
+    if (url.pathname.includes("generate-brief")) {
+      // Route to brief generation handler below
+      return generateBriefHandler(request);
+    }
 
-    // 2. Process user response and detect signals
+    // ===== STEP 1: Extract metadata =====
+    // 2.A.1: Enhanced metadata extraction
+    const extractedMetadata: ExtractedMetadata =
+      await extractMetadataFromMessage(userMessage, previousMetadata);
+
+    // Merge image metadata if provided (from Agent 1.3: ImageAnalyzer)
+    if (imageMetadata) {
+      extractedMetadata.imageMetadata = imageMetadata;
+    }
+
+    // ===== STEP 2: Process response and detect signals =====
+    // 2.A.3: Detect conversion signals
     const processedResponse = await consultationEngine.processUserResponse(
       userMessage,
       extractedMetadata,
-      currentPhase || "intent_detection"
+      currentPhase
     );
 
-    // 3. Determine next phase and generate question
+    // ===== STEP 3: Determine phase transition =====
+    // 2.A.2: Pass phase parameter through API
     const shouldTransition = consultationEngine.shouldMoveToNextPhase(
       extractedMetadata,
       currentPhase
     );
 
-    const nextPhase = shouldTransition
-      ? consultationEngine.determineNextPhase(
-        extractedMetadata.projectScope?.type || "exploratory"
-      )
-      : currentPhase;
+    let nextPhase = currentPhase;
+    let phaseReason = "No transition criteria met";
 
+    if (processedResponse.conversionSignal) {
+      nextPhase = consultationEngine.determineNextPhase(
+        extractedMetadata.projectScope?.type || "exploratory"
+      );
+      phaseReason = "Conversion signal detected";
+    } else if (shouldTransition) {
+      nextPhase = consultationEngine.determineNextPhase(
+        extractedMetadata.projectScope?.type || "exploratory"
+      );
+      phaseReason = "Phase requirements satisfied";
+    }
+
+    // ===== STEP 4: Generate response =====
     const assistantResponse = await consultationEngine.generateNextQuestion(
-      messages || [],
+      messages,
       extractedMetadata,
       nextPhase
     );
 
     return NextResponse.json({
       success: true,
-      extractedMetadata,
-      assistantResponse,
-      nextPhase,
-      shouldTransition,
-      conversionSignal: processedResponse.conversionSignal,
+      data: {
+        // Phase management
+        currentPhase,
+        nextPhase,
+        shouldTransition,
+        phaseReason,
+
+        // Metadata & signals
+        extractedMetadata,
+        conversionSignal: processedResponse.conversionSignal,
+
+        // Response
+        assistantResponse,
+
+        // Progress tracking
+        questionsAsked: consultationEngine.questionsAsked,
+        messageCount: messages.length + 1,
+      },
     });
   } catch (error) {
     console.error("Error processing consultation message:", error);
     return NextResponse.json(
-      { error: "Failed to process message" },
+      {
+        error: "Failed to process message",
+        details: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString(),
+      },
       { status: 500 }
     );
   }
 }
 
-// ===== POST /api/consultation/generate-brief =====
-/**
- * Generate consultation brief from collected metadata
- * Creates structured output for downstream AI agents (Style Profiler, Designer, etc.)
- */
-export async function POST(request: NextRequest) {
-  // Check if this is for brief generation
-  const url = new URL(request.url);
-  if (!url.pathname.includes("generate-brief")) {
-    // Route to main handler above
-    return POST(request);
-  }
-
+// ===== Handler for brief generation =====
+async function generateBriefHandler(request: NextRequest) {
   try {
     const body = await request.json();
-    const {
-      consultationId,
-      messages,
-      metadata,
-      userType,
-      clientName,
-    } = body;
+    const { consultationId, messages, metadata, userType, clientName } = body;
 
     if (!consultationId || !metadata) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields: consultationId, metadata" },
         { status: 400 }
       );
     }
@@ -127,7 +162,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error generating brief:", error);
     return NextResponse.json(
-      { error: "Failed to generate brief" },
+      {
+        error: "Failed to generate brief",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

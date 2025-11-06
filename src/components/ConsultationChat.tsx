@@ -158,6 +158,7 @@ export function ConsultationChat({
 
   const [inputValue, setInputValue] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
+  const [buttonHover, setButtonHover] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize consultation on mount
@@ -261,8 +262,6 @@ export function ConsultationChat({
   if (!context) {
     return <div>Initializing consultation...</div>;
   }
-
-  const [buttonHover, setButtonHover] = useState(false);
 
   return (
     <div style={chatContainerStyle}>

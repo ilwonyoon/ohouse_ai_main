@@ -18,6 +18,59 @@ import { useStreamingResponse } from "@/hooks/useStreamingResponse";
 import { ConsultationMessage } from "@/types/consultation";
 import { extractMetadataFromMessage } from "@/api/metadataExtractor";
 
+// ===== UTILITIES =====
+
+/**
+ * Split message into logical bubbles based on character count
+ * Each bubble should be 150-300 characters for readability
+ */
+function splitMessageIntoBubbles(text: string): string[] {
+  // Only split if message is longer than 200 characters
+  if (text.length <= 200) {
+    return [text];
+  }
+
+  // Split by sentence boundaries (., !, ?)
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  const bubbles: string[] = [];
+  let currentBubble = "";
+
+  for (const sentence of sentences) {
+    const combinedLength = (currentBubble ? currentBubble + " " : "") + sentence;
+
+    // Start new bubble if combined text exceeds 150 characters
+    if (combinedLength.length > 150 && currentBubble) {
+      bubbles.push(currentBubble);
+      currentBubble = sentence;
+    } else {
+      currentBubble = combinedLength.trimStart();
+    }
+  }
+
+  // Add remaining text
+  if (currentBubble) {
+    bubbles.push(currentBubble);
+  }
+
+  return bubbles.length > 0 ? bubbles : [text];
+}
+
+/**
+ * Calculate reading time delay for a message bubble
+ * Based on ~200 words per minute reading speed
+ * 1000 characters ≈ 200 words ≈ 60 seconds
+ * So: charCount * 60ms / 1000 = charCount * 0.06ms
+ * Round to: charCount * 50ms / 1000 = charCount * 0.05ms
+ *
+ * Appears 300ms BEFORE the user would finish reading
+ */
+function calculateMessageDelay(text: string, readingSpeedMs = 50): number {
+  const charCount = text.length;
+  const baseDuration = charCount * readingSpeedMs;
+  // Appear 300ms before user finishes reading
+  return Math.max(500, baseDuration - 300);
+}
+
 // ===== STYLES =====
 
 const chatContainerStyle: React.CSSProperties = {
@@ -166,6 +219,23 @@ const streamingCursorStyle: React.CSSProperties = {
 
 // ===== COMPONENT =====
 
+// ===== CONSTANTS =====
+
+/**
+ * Default greeting message for consultation
+ * Sets expectations and context for the conversation
+ */
+const DEFAULT_GREETING = `Hi! 👋 I'm your AI interior design consultant.
+
+Here's what we'll do together:
+1. **Learn about your space** - Room size, layout, natural light, current furniture
+2. **Understand your goals** - What look do you want? What problems are you solving?
+3. **Explore your lifestyle** - How do you live in this space? Entertaining? Kids? WFH?
+4. **Collect inspiration** - Colors, styles, materials you love
+5. **Build your brief** - A detailed design roadmap for professional designers
+
+**Let's start!** Tell me about the space you'd like to transform. 🏠`;
+
 export interface ConsultationChatProps {
   userId: string;
   onBriefGenerated?: (brief: any) => void;
@@ -175,7 +245,7 @@ export interface ConsultationChatProps {
 export function ConsultationChat({
   userId,
   onBriefGenerated,
-  initialMessage = "Hi! 👋 I'm your AI interior design consultant.\n\nHere's what we'll do together:\n1. **Learn about your space** - Room size, layout, natural light\n2. **Understand your goals** - What look do you want?\n3. **Explore your lifestyle** - How do you live in this space?\n4. **Collect inspiration** - Colors, styles, materials you love\n5. **Build your brief** - A detailed design roadmap\n\nLet's start! Tell me about the space you'd like to transform. 🏠",
+  initialMessage = DEFAULT_GREETING,
 }: ConsultationChatProps) {
   const {
     context,
@@ -210,7 +280,9 @@ export function ConsultationChat({
   const [buttonHover, setButtonHover] = useState(false);
   const [tokensUsed, setTokensUsed] = useState(0);
   const [estimatedCost, setEstimatedCost] = useState(0);
+  const [pendingBubbles, setPendingBubbles] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const staggerTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize consultation on mount
   useEffect(() => {
@@ -229,13 +301,10 @@ export function ConsultationChat({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingText, isStreaming]);
 
-  // Handle streaming completion - update state with metadata and add final message
+  // Handle streaming completion - split message and prepare for staggered display
   useEffect(() => {
     if (!isStreaming && streamMetadata && streamingText) {
       try {
-        // Add the streamed response as assistant message
-        addMessage("assistant", streamingText);
-
         // Update metadata from streaming response
         if (streamMetadata.extractedMetadata) {
           mergeMetadata(streamMetadata.extractedMetadata);
@@ -265,10 +334,18 @@ export function ConsultationChat({
           updateCompletionStatus("ready_for_style_profiler");
         }
 
+        // Split message into bubbles for staggered display
+        const bubbles = splitMessageIntoBubbles(streamingText);
+        setPendingBubbles(bubbles);
+
+        // Clear loading state
+        setIsLoading(false);
+
         // Reset streaming state
         resetStream();
       } catch (error) {
         console.error("Error handling stream completion:", error);
+        setIsLoading(false);
       }
     }
   }, [
@@ -276,13 +353,56 @@ export function ConsultationChat({
     streamMetadata,
     streamingText,
     currentPhase,
-    addMessage,
     mergeMetadata,
     updatePhase,
     updateUserType,
     updateCompletionStatus,
     resetStream,
+    setIsLoading,
   ]);
+
+  // Handle staggered message display
+  useEffect(() => {
+    // If we have pending bubbles, display them with staggered timing
+    if (pendingBubbles.length > 0) {
+      // Clear any existing timer
+      if (staggerTimerRef.current) {
+        clearTimeout(staggerTimerRef.current);
+      }
+
+      // Display first bubble immediately
+      const firstBubble = pendingBubbles[0];
+      addMessage("assistant", firstBubble);
+
+      // Display remaining bubbles with delays
+      if (pendingBubbles.length > 1) {
+        let currentDelay = 0;
+
+        for (let i = 1; i < pendingBubbles.length; i++) {
+          const bubble = pendingBubbles[i];
+          // Calculate delay based on the PREVIOUS bubble's reading time
+          const previousBubble = pendingBubbles[i - 1];
+          const readingDelay = calculateMessageDelay(previousBubble);
+          currentDelay += readingDelay;
+
+          // Schedule this bubble to be added
+          staggerTimerRef.current = setTimeout(() => {
+            addMessage("assistant", bubble);
+          }, currentDelay);
+        }
+      }
+
+      // Clear pending bubbles after scheduling all messages
+      setPendingBubbles([]);
+    }
+
+    // Cleanup: clear timer on unmount
+    return () => {
+      if (staggerTimerRef.current) {
+        clearTimeout(staggerTimerRef.current);
+      }
+    };
+  }, [pendingBubbles, addMessage]);
 
   // Handle user message submission with streaming
   const handleSendMessage = useCallback(async () => {
@@ -296,10 +416,14 @@ export function ConsultationChat({
       // This fixes the disappearing message bug - user message must be added BEFORE streaming
       addMessage("user", userMessageText);
 
-      // STEP 2: Reset streaming state
+      // STEP 2: Set loading state to show indicator
+      setIsLoading(true);
+      setError(null);
+
+      // STEP 3: Reset streaming state
       resetStream();
 
-      // STEP 3: Start streaming response from OpenAI
+      // STEP 4: Start streaming response from OpenAI
       await startStream(
         userMessageText,
         context.id,
@@ -307,9 +431,13 @@ export function ConsultationChat({
         currentPhase,
         metadata
       );
+
+      // STEP 5: Clear loading state once streaming completes
+      // (streaming completion is handled in the useEffect below)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError(errorMessage);
+      setIsLoading(false);
       addMessage(
         "assistant",
         `Sorry, I encountered an error: ${errorMessage}. Please try again.`
@@ -326,6 +454,7 @@ export function ConsultationChat({
     currentPhase,
     metadata,
     setError,
+    setIsLoading,
   ]);
 
   // Handle Enter key press
@@ -429,6 +558,13 @@ export function ConsultationChat({
         </div>
       )}
 
+      {/* Token Usage Counter */}
+      {tokensUsed > 0 && (
+        <div style={tokenCounterStyle}>
+          📊 Tokens: {tokensUsed} | Cost: ${estimatedCost.toFixed(3)}
+        </div>
+      )}
+
       <style>{`
         @keyframes bounce {
           0%, 80%, 100% {
@@ -436,6 +572,14 @@ export function ConsultationChat({
           }
           40% {
             transform: scaleY(1.5);
+          }
+        }
+        @keyframes blink {
+          0%, 50% {
+            opacity: 1;
+          }
+          51%, 100% {
+            opacity: 0;
           }
         }
       `}</style>

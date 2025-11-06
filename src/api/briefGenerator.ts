@@ -33,36 +33,31 @@ export class BriefGenerator {
         return this.generateMinimalBrief(
           consultationId,
           metadata,
-          clientName,
-          messages
+          clientName
         );
       case "standard":
         return this.generateStandardBrief(
           consultationId,
           metadata,
-          clientName,
-          messages
+          clientName
         );
       case "exploratory":
         return this.generateExploratoryBrief(
           consultationId,
           metadata,
-          clientName,
-          messages
+          clientName
         );
       case "partial":
         return this.generatePartialBrief(
           consultationId,
           metadata,
-          clientName,
-          messages
+          clientName
         );
       default:
         return this.generateMinimalBrief(
           consultationId,
           metadata,
-          clientName,
-          messages
+          clientName
         );
     }
   }
@@ -103,8 +98,7 @@ export class BriefGenerator {
   private static generateMinimalBrief(
     consultationId: string,
     metadata: ExtractedMetadata,
-    clientName: string | undefined,
-    messages: ConsultationMessage[]
+    clientName: string | undefined
   ): ConsultationBrief {
     const roomName = metadata.room?.primary || "Room";
     const emotionalOutcome = metadata.goals?.emotional_outcome || "transformed";
@@ -244,8 +238,7 @@ export class BriefGenerator {
   private static generateExploratoryBrief(
     consultationId: string,
     metadata: ExtractedMetadata,
-    clientName: string | undefined,
-    messages: ConsultationMessage[]
+    clientName: string | undefined
   ): ConsultationBrief {
     return {
       id: `brief_${Date.now()}`,

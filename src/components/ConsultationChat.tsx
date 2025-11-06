@@ -1,13 +1,20 @@
 /**
  * Consultation Chat Component
  * Main UI for AI Interior Design Consultant Chatbot
- * Handles message display, user input, and state management
+ * Handles message display, user input, and state management with streaming responses
+ *
+ * Key Features:
+ * - Real-time streaming responses from OpenAI
+ * - Token usage tracking and display
+ * - User message persistence (fixes disappearing message bug)
+ * - Loading indicator during streaming
  */
 
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useConsultationState } from "@/hooks/useConsultationState";
+import { useStreamingResponse } from "@/hooks/useStreamingResponse";
 import { ConsultationMessage } from "@/types/consultation";
 import { extractMetadataFromMessage } from "@/api/metadataExtractor";
 
@@ -124,6 +131,39 @@ const loadingDotStyle: React.CSSProperties = {
   borderRadius: "50%",
 };
 
+const tokenCounterStyle: React.CSSProperties = {
+  position: "fixed",
+  top: "16px",
+  right: "16px",
+  padding: "8px 12px",
+  backgroundColor: "#f0f0f0",
+  borderRadius: "6px",
+  fontSize: "11px",
+  color: "#2F3438",
+  fontWeight: "500",
+  border: "1px solid #E6E6E6",
+  zIndex: 1000,
+};
+
+const streamingBubbleStyle: React.CSSProperties = {
+  padding: "12px 16px",
+  backgroundColor: "transparent",
+  color: "#2F3438",
+  fontSize: "14px",
+  lineHeight: "1.4",
+  fontFamily: "inherit",
+  maxWidth: "80%",
+};
+
+const streamingCursorStyle: React.CSSProperties = {
+  display: "inline-block",
+  width: "2px",
+  height: "1em",
+  backgroundColor: "#2F3438",
+  marginLeft: "2px",
+  animation: "blink 1s infinite",
+};
+
 // ===== COMPONENT =====
 
 export interface ConsultationChatProps {
@@ -135,7 +175,7 @@ export interface ConsultationChatProps {
 export function ConsultationChat({
   userId,
   onBriefGenerated,
-  initialMessage = "Hi! Welcome! I'm here to help you create a space you'll love.\n\nWhat brings you here today?",
+  initialMessage = "Hi! 👋 I'm your AI interior design consultant.\n\nHere's what we'll do together:\n1. **Learn about your space** - Room size, layout, natural light\n2. **Understand your goals** - What look do you want?\n3. **Explore your lifestyle** - How do you live in this space?\n4. **Collect inspiration** - Colors, styles, materials you love\n5. **Build your brief** - A detailed design roadmap\n\nLet's start! Tell me about the space you'd like to transform. 🏠",
 }: ConsultationChatProps) {
   const {
     context,
@@ -156,9 +196,20 @@ export function ConsultationChat({
     setError,
   } = useConsultationState();
 
+  const {
+    text: streamingText,
+    isStreaming,
+    metadata: streamMetadata,
+    error: streamError,
+    startStream,
+    reset: resetStream,
+  } = useStreamingResponse();
+
   const [inputValue, setInputValue] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
   const [buttonHover, setButtonHover] = useState(false);
+  const [tokensUsed, setTokensUsed] = useState(0);
+  const [estimatedCost, setEstimatedCost] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize consultation on mount
@@ -176,80 +227,106 @@ export function ConsultationChat({
   // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, streamingText, isStreaming]);
 
-  // Handle user message submission
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading || !context) return;
+  // Handle streaming completion - update state with metadata and add final message
+  useEffect(() => {
+    if (!isStreaming && streamMetadata && streamingText) {
+      try {
+        // Add the streamed response as assistant message
+        addMessage("assistant", streamingText);
+
+        // Update metadata from streaming response
+        if (streamMetadata.extractedMetadata) {
+          mergeMetadata(streamMetadata.extractedMetadata);
+        }
+
+        // Update phase if needed
+        if (streamMetadata.nextPhase && streamMetadata.nextPhase !== currentPhase) {
+          updatePhase(streamMetadata.nextPhase);
+
+          if (streamMetadata.extractedMetadata?.projectScope?.type) {
+            updateUserType(streamMetadata.extractedMetadata.projectScope.type);
+          }
+        }
+
+        // Update token count (rough estimate: 1 token ≈ 4 characters)
+        const estimatedTokens = Math.ceil(streamingText.length / 4);
+        setTokensUsed((prev) => prev + estimatedTokens);
+        // Estimate cost: GPT-4 Turbo is ~$0.01 per 1K tokens
+        const cost = (estimatedTokens / 1000) * 0.01;
+        setEstimatedCost((prev) => prev + cost);
+
+        // Check if consultation is complete
+        if (
+          streamMetadata.nextPhase === "phase_8_synthesis" ||
+          streamMetadata.nextPhase === "completed"
+        ) {
+          updateCompletionStatus("ready_for_style_profiler");
+        }
+
+        // Reset streaming state
+        resetStream();
+      } catch (error) {
+        console.error("Error handling stream completion:", error);
+      }
+    }
+  }, [
+    isStreaming,
+    streamMetadata,
+    streamingText,
+    currentPhase,
+    addMessage,
+    mergeMetadata,
+    updatePhase,
+    updateUserType,
+    updateCompletionStatus,
+    resetStream,
+  ]);
+
+  // Handle user message submission with streaming
+  const handleSendMessage = useCallback(async () => {
+    if (!inputValue.trim() || isStreaming || !context) return;
 
     const userMessageText = inputValue.trim();
     setInputValue("");
-    setIsLoading(true);
-    setError(null);
 
     try {
-      // Add user message to state
+      // STEP 1: Add user message to state IMMEDIATELY
+      // This fixes the disappearing message bug - user message must be added BEFORE streaming
       addMessage("user", userMessageText);
 
-      // Call API to process message
-      const response = await fetch("/api/consultation/process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userMessage: userMessageText,
-          consultationId: context.id,
-          previousMetadata: metadata,
-          currentPhase: currentPhase,
-          messages: messages,
-        }),
-      });
+      // STEP 2: Reset streaming state
+      resetStream();
 
-      if (!response.ok) {
-        throw new Error("Failed to process message");
-      }
-
-      const data = await response.json();
-      const { extractedMetadata, assistantResponse, nextPhase, conversionSignal } = data.data;
-
-      // Update metadata
-      if (extractedMetadata) {
-        mergeMetadata(extractedMetadata);
-      }
-
-      // Update phase if needed
-      if (nextPhase && nextPhase !== currentPhase) {
-        updatePhase(nextPhase);
-
-        // Update user type based on scope
-        if (extractedMetadata?.projectScope?.type) {
-          updateUserType(extractedMetadata.projectScope.type);
-        }
-      }
-
-      // Handle conversion signal for exploratory users
-      if (conversionSignal) {
-        console.log("Conversion signal detected:", conversionSignal);
-        // UI can show notification or trigger action
-      }
-
-      // Add assistant response
-      if (assistantResponse) {
-        addMessage("assistant", assistantResponse.conversationalMessage);
-      }
-
-      // Check if consultation is complete
-      if (nextPhase === "synthesis" || nextPhase === "completed") {
-        updateCompletionStatus("ready_for_style_profiler");
-      }
+      // STEP 3: Start streaming response from OpenAI
+      await startStream(
+        userMessageText,
+        context.id,
+        messages.map((m) => ({ role: m.role, content: m.content })),
+        currentPhase,
+        metadata
+      );
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError(errorMessage);
-      // Show error to user
-      addMessage("assistant", `Sorry, I encountered an error: ${errorMessage}. Please try again.`);
-    } finally {
-      setIsLoading(false);
+      addMessage(
+        "assistant",
+        `Sorry, I encountered an error: ${errorMessage}. Please try again.`
+      );
     }
-  };
+  }, [
+    inputValue,
+    isStreaming,
+    context,
+    addMessage,
+    resetStream,
+    startStream,
+    messages,
+    currentPhase,
+    metadata,
+    setError,
+  ]);
 
   // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

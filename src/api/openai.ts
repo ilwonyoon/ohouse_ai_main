@@ -162,7 +162,7 @@ export async function callOpenAI(messages: ChatMessage[]): Promise<string> {
 /**
  * Generate system prompt based on conversation phase and context
  */
-function generateSystemPrompt(phase?: string): string {
+export function generateSystemPrompt(phase?: string): string {
   const basePrompt = `You are an expert interior design consultant AI. Your role is to conduct adaptive, intelligent initial consultations for interior design projects.
 
 ## Core Principles

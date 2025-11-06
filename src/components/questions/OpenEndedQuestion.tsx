@@ -4,6 +4,7 @@
  * S2.D: Part of new UI components for consultation questions
  */
 
+/** @jsxImportSource @emotion/react */
 "use client";
 
 import React from "react";

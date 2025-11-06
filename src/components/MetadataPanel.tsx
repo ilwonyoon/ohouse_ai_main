@@ -4,9 +4,10 @@
  * Shows what information has been collected and what's still needed
  */
 
+/** @jsxImportSource @emotion/react */
 "use client";
 
-import _React from "react";
+import React from "react";
 import { css } from "@emotion/react";
 import { PrimitiveTokens, SemanticTokens } from "@/tokens";
 import { ExtractedMetadata, ConsultationContext, ConsultationPhase } from "@/types/consultation";

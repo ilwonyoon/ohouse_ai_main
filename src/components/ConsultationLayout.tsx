@@ -4,9 +4,10 @@
  * Follows ohouse-ai-app design system
  */
 
+/** @jsxImportSource @emotion/react */
 "use client";
 
-import _React from "react";
+import React from "react";
 import { css } from "@emotion/react";
 import { PrimitiveTokens, SemanticTokens } from "@/tokens";
 import { ConsultationChat } from "./ConsultationChat";

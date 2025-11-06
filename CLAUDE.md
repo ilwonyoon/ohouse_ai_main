@@ -342,14 +342,38 @@ Comprehensive design system in `/docs/`:
 
 ## Environment Variables
 
-Create `.env.local` in `/projects/ohouse-ai-app/`:
+### Root-Level Shared Keys
 
-```
-OPENAI_API_KEY=your_key_here
-NANO_BANANAS_API_KEY=your_key_here
+Create `.env` in `/Ohouse_ai_onGoing/` for shared API keys used by all projects:
+
+```bash
+# Shared API Keys (accessible to all projects)
+OPENAI_API_KEY=your_openai_key_here
+NANO_BANANAS_API_KEY=your_nano_bananas_key_here
 ```
 
-See `.env.example` for reference.
+See `/.env.example` for complete reference and documentation.
+
+### Project-Specific Configuration
+
+Create `.env.local` in each project folder (e.g., `/projects/ohouse-ai-app/.env.local`):
+
+```bash
+# Inherited from root .env automatically
+OPENAI_API_KEY=your_key_here  # Optional: override root key if needed
+
+# Project-specific variables
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+```
+
+See `projects/[project-name]/.env.example` for reference.
+
+### API Key Sharing Strategy
+
+- **Shared**: Store `OPENAI_API_KEY` and `NANO_BANANAS_API_KEY` in root `.env`
+- **Access**: All projects inherit via `process.env.OPENAI_API_KEY`
+- **Override**: Projects can set their own `.env.local` to override root keys
+- **Never commit**: `.env.local` files are in `.gitignore` (contain sensitive data)
 
 ## TypeScript & Linting
 
@@ -383,9 +407,129 @@ See `.env.example` for reference.
 
 ## Monorepo Structure
 
-- **Single Active Project**: `projects/ohouse-ai-app/` is the main focus
-- **Future Projects**: Add new projects in `projects/[project-name]/` with their own `package.json`
+- **Multiple Projects**: Multiple projects in `projects/[project-name]/`
+- **Shared Design System**: All projects use tokens from `/docs/tokens.ts`
+- **Shared APIs**: All projects can share OpenAI API key from root `.env` file
 - **Shared Code**: Place reusable utilities in `shared/` if needed (currently empty)
+
+### Creating New Projects - MANDATORY CHECKLIST
+
+**EVERY new project must follow these standards:**
+
+#### 1️⃣ **Design System Integration** (MUST)
+- Copy `/docs/tokens.ts` → `src/tokens.ts` (local copy for imports)
+- Import tokens: `import { PrimitiveTokens, SemanticTokens } from '@/tokens'`
+- Apply to ALL components:
+  - Colors: `SemanticTokens.Color.Foreground.BRAND`, `.Background.DEFAULT`, etc.
+  - Typography: `PrimitiveTokens.Typography.FontSize.MD`, `.FontWeight.SEMIBOLD`, etc.
+  - Spacing: `PrimitiveTokens.Spacing.MEDIUM`, `.SMALL`, `.LARGE`, etc.
+  - Border Radius: `PrimitiveTokens.BorderRadius.TIGHT` (8px), `.SMOOTH` (12px)
+  - Font Family: `PrimitiveTokens.Typography.FontFamily.PRIMARY` + fallback
+- ❌ **NEVER hardcode values**: No `#0AA5FF`, no `14px padding`, no specific colors
+- ✅ **ALL styles use tokens** for consistency and maintainability
+
+#### 2️⃣ **Mobile Viewport Setup** (MUST)
+- **Target Viewport**: 375×812px (iPhone SE standard)
+- **Fallback Viewport**: Scale to 343px content width with 16px safe area padding
+- **Layout Structure**:
+  ```
+  Container (viewport wrapper)
+  └─ Main Content (375px × 812px mobile frame)
+     └─ Optional: Metadata/Info Panel (sidebar on desktop, hidden on mobile)
+  ```
+- Create dedicated mobile viewport component (example: `MobileContainer`)
+- Responsive design: Works on mobile + desktop/tablet
+- Use design system tokens for all sizes
+
+#### 3️⃣ **Project Structure** (STANDARD)
+```
+projects/[project-name]/
+├── src/
+│   ├── app/                      # Next.js App Router
+│   │   ├── page.tsx             # Home/entry page
+│   │   ├── layout.tsx           # Root layout
+│   │   ├── api/                 # API routes
+│   │   ├── globals.css          # Global styles
+│   │   └── [feature]/           # Feature pages
+│   ├── components/              # React components
+│   │   ├── [FeatureName].tsx   # Main components
+│   │   └── [SubComponent].tsx  # Sub components
+│   ├── hooks/                   # Custom React hooks
+│   ├── api/                     # API clients
+│   ├── types/                   # TypeScript definitions
+│   ├── styles/                  # Global styles (if needed)
+│   ├── tokens.ts               # Design system tokens (COPIED)
+│   └── utils/                  # Utility functions
+├── public/                      # Static assets
+├── package.json                # Dependencies (standard template)
+├── tsconfig.json              # TypeScript config (strict mode)
+├── next.config.ts             # Next.js config
+├── .eslintrc.json            # ESLint rules
+├── .gitignore                # Git ignore rules
+├── .env.example              # Environment variables template
+├── .env.local               # LOCAL ONLY - DO NOT COMMIT
+├── README.md                # Project documentation
+└── [ARCHITECTURE.md]        # Optional: Technical deep dive
+```
+
+#### 4️⃣ **Technology Stack** (STANDARD)
+- **Framework**: Next.js 15.3 with App Router
+- **Language**: TypeScript 5.x (strict mode: `true`)
+- **UI Library**: React 19.0.0
+- **State Management**: Jotai 2.12.4 (with localStorage persistence)
+- **Styling**: Emotion CSS-in-JS (`@emotion/react`, `@emotion/styled`)
+- **Server State**: TanStack Query 5.72.2
+- **Code Quality**: ESLint + TypeScript strict mode
+- **Path Alias**: `@/*` → `src/*`
+
+#### 5️⃣ **Environment Variables** (SHARED)
+
+**For All Projects**:
+- Shared API keys are stored in root `/Ohouse_ai_onGoing/.env` (see `/.env.example`)
+- Each project inherits these via `process.env.OPENAI_API_KEY` automatically
+- No need to duplicate keys in each project
+
+**Create `.env.local` in project root** (optional - only if overriding shared values):
+
+```bash
+# Only add if you need to override root values
+# OPENAI_API_KEY=project_specific_key_if_needed
+
+# Project-specific configuration
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+```
+
+**API Key Sharing Strategy**:
+- ✅ **Master Keys**: Store in root `/Ohouse_ai_onGoing/.env` (e.g., `OPENAI_API_KEY=sk-...`)
+- ✅ **Project Access**: All projects access via `process.env.OPENAI_API_KEY`
+- ✅ **Override Option**: Each project can create `.env.local` with same key to override
+- ✅ **Never Commit**: All `.env.local` files are `.gitignore`d (contain secrets)
+- ✅ **Deployment**: Add same keys to Vercel/hosting environment settings
+
+#### 6️⃣ **Development Commands** (STANDARD)
+```bash
+# From project directory
+npm install              # Install dependencies
+npm run dev            # Start dev server (auto port selection)
+npm run build          # Production build
+npm run typecheck      # Type checking
+npm run lint           # ESLint check
+npm run lint:fix       # Auto-fix ESLint issues
+```
+
+#### 7️⃣ **Git Workflow** (STANDARD)
+- **Branch Naming**: `feature/[feature-name]` or `fix/[bug-name]`
+- **Commits**: Use `🤖 Generated with Claude Code` signature
+- **Never Commit**:
+  - `.env.local` (has API keys)
+  - `node_modules/`
+  - `.next/`
+  - `dist/`
+- **Always Commit**:
+  - `.env.example` (template only)
+  - `src/` code
+  - Configuration files
+  - Documentation
 
 ## Known Incomplete/Placeholder Areas
 

@@ -12,9 +12,12 @@ Ohouse_ai_onGoing/
 │   └── [future-projects]/            # Add new projects here
 ├── shared/                            # Shared utilities, types, helpers (optional)
 ├── docs/                              # Documentation
+├── archive/                           # Legacy plans, reports, and docs (read-only reference)
 ├── tech_stack.md                      # Frontend tech stack reference
 └── README.md                          # This file
 ```
+
+Archived planning material now lives in `archive/` (see `archive/README.md` for structure).
 
 ## 🚀 Projects
 

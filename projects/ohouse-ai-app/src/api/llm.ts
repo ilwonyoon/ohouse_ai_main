@@ -1,45 +1,38 @@
-/**
- * LLM Integration - ChatGPT API Client
- * Handles communication with OpenAI ChatGPT API for design suggestions
- */
+// LLM API client for OpenAI ChatGPT
+// TODO: Implement actual API integration
 
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { ConsultantMessage, ConsultantResponse } from "@/types";
 
-export interface LLMResponse {
-  content: string;
-  usage?: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+export async function getConsultantResponse(
+  messages: ConsultantMessage[]
+): Promise<ConsultantResponse> {
+  if (!OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is not set");
+  }
+
+  // TODO: Implement ChatGPT API call
+  // This is a placeholder response
+  return {
+    message: "This is a placeholder response from the consultant.",
+    suggestedActions: [],
+    metadata: {},
   };
 }
 
-/**
- * Call ChatGPT for design suggestions based on room details
- */
-export async function getDesignSuggestions(_prompt: string): Promise<LLMResponse> {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY is not set');
+export async function refineConsultation(
+  originalMessage: string,
+  feedback: string
+): Promise<ConsultantResponse> {
+  if (!OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is not set");
   }
 
-  // TODO: Implement OpenAI API call
-  // This is a placeholder for the actual implementation
-  throw new Error('LLM implementation pending');
-}
-
-/**
- * Refine design suggestions based on user feedback
- */
-export async function refineDesignSuggestions(
-  _messages: ChatMessage[]
-): Promise<LLMResponse> {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY is not set');
-  }
-
-  // TODO: Implement multi-turn conversation with ChatGPT
-  throw new Error('LLM implementation pending');
+  // TODO: Implement refinement API call
+  return {
+    message: "This is a refined placeholder response.",
+    suggestedActions: [],
+    metadata: {},
+  };
 }

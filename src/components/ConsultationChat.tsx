@@ -7,149 +7,122 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { css } from "@emotion/react";
 import { useConsultationState } from "@/hooks/useConsultationState";
 import { ConsultationMessage } from "@/types/consultation";
 import { extractMetadataFromMessage } from "@/api/metadataExtractor";
 
 // ===== STYLES =====
 
-const chatContainerStyle = css`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-`;
+const chatContainerStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  height: "100%",
+  backgroundColor: "#ffffff",
+  borderRadius: "12px",
+  overflow: "hidden",
+  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+};
 
-const messagesContainerStyle = css`
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
+const messagesContainerStyle: React.CSSProperties = {
+  flex: 1,
+  overflowY: "auto",
+  padding: "16px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "12px",
+};
 
-const messageStyle = (role: "user" | "assistant") => css`
-  display: flex;
-  justify-content: ${role === "user" ? "flex-end" : "flex-start"};
-  gap: 8px;
-`;
+const messageStyle = (role: "user" | "assistant"): React.CSSProperties => ({
+  display: "flex",
+  justifyContent: role === "user" ? "flex-end" : "flex-start",
+  gap: "8px",
+});
 
-const messageBubbleStyle = (role: "user" | "assistant") => css`
-  max-width: 80%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background-color: ${role === "user" ? "#0AA5FF" : "#F0F0F0"};
-  color: ${role === "user" ? "#FFFFFF" : "#2F3438"};
-  word-wrap: break-word;
-  font-size: 14px;
-  line-height: 1.4;
+const messageBubbleStyle = (role: "user" | "assistant"): React.CSSProperties => ({
+  maxWidth: "80%",
+  padding: "12px 16px",
+  borderRadius: "12px",
+  backgroundColor: role === "user" ? "#0AA5FF" : "#F0F0F0",
+  color: role === "user" ? "#FFFFFF" : "#2F3438",
+  wordWrap: "break-word",
+  fontSize: "14px",
+  lineHeight: "1.4",
+  marginLeft: role === "user" ? "auto" : "0",
+});
 
-  /* User messages align right, assistant align left */
-  margin-left: ${role === "user" ? "auto" : "0"};
-`;
+const inputContainerStyle: React.CSSProperties = {
+  padding: "16px",
+  borderTop: "1px solid #E6E6E6",
+  display: "flex",
+  gap: "8px",
+};
 
-const inputContainerStyle = css`
-  padding: 16px;
-  border-top: 1px solid #E6E6E6;
-  display: flex;
-  gap: 8px;
-`;
+const inputFieldStyle: React.CSSProperties = {
+  flex: 1,
+  padding: "10px 14px",
+  border: "1px solid #E6E6E6",
+  borderRadius: "8px",
+  fontSize: "14px",
+  fontFamily: "inherit",
+  outline: "none",
+  transition: "border-color 0.2s",
+};
 
-const inputFieldStyle = css`
-  flex: 1;
-  padding: 10px 14px;
-  border: 1px solid #E6E6E6;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.2s;
+const sendButtonStyle: React.CSSProperties = {
+  padding: "10px 16px",
+  backgroundColor: "#0aa5ff",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  fontSize: "14px",
+  fontWeight: "500",
+  cursor: "pointer",
+  transition: "background-color 0.2s",
+};
 
-  &:focus {
-    border-color: #0aa5ff;
-  }
-`;
+const sendButtonHoverStyle: React.CSSProperties = {
+  backgroundColor: "#0892d6",
+};
 
-const sendButtonStyle = css`
-  padding: 10px 16px;
-  background-color: #0aa5ff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
+const sendButtonDisabledStyle: React.CSSProperties = {
+  backgroundColor: "#ccc",
+  cursor: "not-allowed",
+};
 
-  &:hover {
-    background-color: #0892d6;
-  }
+const headerStyle: React.CSSProperties = {
+  padding: "16px",
+  borderBottom: "1px solid #E6E6E6",
+  backgroundColor: "#f9f9f9",
+};
 
-  &:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-`;
+const headerTitleStyle: React.CSSProperties = {
+  margin: "0",
+  fontSize: "18px",
+  fontWeight: "600",
+  color: "#2f3438",
+};
 
-const headerStyle = css`
-  padding: 16px;
-  border-bottom: 1px solid #E6E6E6;
-  background-color: #f9f9f9;
+const headerSubtitleStyle: React.CSSProperties = {
+  margin: "4px 0 0 0",
+  fontSize: "12px",
+  color: "#828c94",
+};
 
-  h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #2f3438;
-  }
+const loadingIndicatorStyle: React.CSSProperties = {
+  display: "flex",
+  gap: "4px",
+  padding: "12px 16px",
+  backgroundColor: "#f0f0f0",
+  borderRadius: "12px",
+  width: "fit-content",
+};
 
-  p {
-    margin: 4px 0 0 0;
-    font-size: 12px;
-    color: #828c94;
-  }
-`;
-
-const loadingIndicatorStyle = css`
-  display: flex;
-  gap: 4px;
-  padding: 12px 16px;
-  background-color: #f0f0f0;
-  border-radius: 12px;
-  width: fit-content;
-
-  span {
-    width: 8px;
-    height: 8px;
-    background-color: #999;
-    border-radius: 50%;
-    animation: bounce 1.4s infinite;
-
-    &:nth-of-type(2) {
-      animation-delay: 0.2s;
-    }
-
-    &:nth-of-type(3) {
-      animation-delay: 0.4s;
-    }
-  }
-
-  @keyframes bounce {
-    0%,
-    80%,
-    100% {
-      transform: scaleY(1);
-    }
-    40% {
-      transform: scaleY(1.5);
-    }
-  }
-`;
+const loadingDotStyle: React.CSSProperties = {
+  width: "8px",
+  height: "8px",
+  backgroundColor: "#999",
+  borderRadius: "50%",
+};
 
 // ===== COMPONENT =====
 
@@ -289,19 +262,21 @@ export function ConsultationChat({
     return <div>Initializing consultation...</div>;
   }
 
+  const [buttonHover, setButtonHover] = useState(false);
+
   return (
-    <div css={chatContainerStyle}>
+    <div style={chatContainerStyle}>
       {/* Header */}
-      <div css={headerStyle}>
-        <h2>Interior Design Consultant</h2>
-        <p>Let's discover the perfect design for your space</p>
+      <div style={headerStyle}>
+        <h2 style={headerTitleStyle}>Interior Design Consultant</h2>
+        <p style={headerSubtitleStyle}>Let's discover the perfect design for your space</p>
       </div>
 
       {/* Messages */}
-      <div css={messagesContainerStyle}>
+      <div style={messagesContainerStyle}>
         {messages.map((message: ConsultationMessage) => (
-          <div key={message.id} css={messageStyle(message.role)}>
-            <div css={messageBubbleStyle(message.role)}>
+          <div key={message.id} style={messageStyle(message.role)}>
+            <div style={messageBubbleStyle(message.role)}>
               {message.content}
             </div>
           </div>
@@ -309,11 +284,11 @@ export function ConsultationChat({
 
         {/* Loading indicator */}
         {isLoading && (
-          <div css={messageStyle("assistant")}>
-            <div css={loadingIndicatorStyle}>
-              <span></span>
-              <span></span>
-              <span></span>
+          <div style={messageStyle("assistant")}>
+            <div style={loadingIndicatorStyle}>
+              <span style={{...loadingDotStyle, animation: "bounce 1.4s infinite"}}></span>
+              <span style={{...loadingDotStyle, animation: "bounce 1.4s infinite 0.2s"}}></span>
+              <span style={{...loadingDotStyle, animation: "bounce 1.4s infinite 0.4s"}}></span>
             </div>
           </div>
         )}
@@ -324,23 +299,23 @@ export function ConsultationChat({
       {/* Error message */}
       {error && (
         <div
-          css={css`
-            padding: 12px 16px;
-            background-color: #ffe5e5;
-            color: #cc0000;
-            font-size: 12px;
-            border-bottom: 1px solid #E6E6E6;
-          `}
+          style={{
+            padding: "12px 16px",
+            backgroundColor: "#ffe5e5",
+            color: "#cc0000",
+            fontSize: "12px",
+            borderBottom: "1px solid #E6E6E6",
+          }}
         >
           {error}
         </div>
       )}
 
       {/* Input */}
-      <div css={inputContainerStyle}>
+      <div style={inputContainerStyle}>
         <input
           type="text"
-          css={inputFieldStyle}
+          style={inputFieldStyle}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
@@ -348,8 +323,14 @@ export function ConsultationChat({
           disabled={isLoading || completionStatus === "ready_for_style_profiler"}
         />
         <button
-          css={sendButtonStyle}
+          style={{
+            ...sendButtonStyle,
+            ...(buttonHover ? sendButtonHoverStyle : {}),
+            ...(isLoading || !inputValue.trim() || completionStatus === "ready_for_style_profiler" ? sendButtonDisabledStyle : {}),
+          }}
           onClick={handleSendMessage}
+          onMouseEnter={() => setButtonHover(true)}
+          onMouseLeave={() => setButtonHover(false)}
           disabled={isLoading || !inputValue.trim() || completionStatus === "ready_for_style_profiler"}
         >
           Send
@@ -359,18 +340,29 @@ export function ConsultationChat({
       {/* Completion message */}
       {completionStatus === "ready_for_style_profiler" && (
         <div
-          css={css`
-            padding: 12px 16px;
-            background-color: #e5f2ff;
-            color: #0066cc;
-            font-size: 12px;
-            border-top: 1px solid #E6E6E6;
-            text-align: center;
-          `}
+          style={{
+            padding: "12px 16px",
+            backgroundColor: "#e5f2ff",
+            color: "#0066cc",
+            fontSize: "12px",
+            borderTop: "1px solid #E6E6E6",
+            textAlign: "center",
+          }}
         >
           ✓ Consultation complete! Ready for Style Profiler
         </div>
       )}
+
+      <style>{`
+        @keyframes bounce {
+          0%, 80%, 100% {
+            transform: scaleY(1);
+          }
+          40% {
+            transform: scaleY(1.5);
+          }
+        }
+      `}</style>
     </div>
   );
 }

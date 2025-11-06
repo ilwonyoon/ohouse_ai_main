@@ -286,11 +286,17 @@ export function ConsultationChat({
 
   // Initialize consultation on mount
   useEffect(() => {
-    if (!isInitialized && !context) {
-      const newContext = initializeConsultation(userId);
-      if (newContext) {
-        // Add initial assistant message
-        addMessage("assistant", initialMessage);
+    if (!isInitialized) {
+      // Always initialize fresh consultation, or add greeting if context exists but no messages
+      if (!context || context.messages.length === 0) {
+        const newContext = initializeConsultation(userId);
+        if (newContext) {
+          // Add initial assistant message
+          addMessage("assistant", initialMessage);
+          setIsInitialized(true);
+        }
+      } else {
+        // Context exists with messages, just mark as initialized
         setIsInitialized(true);
       }
     }

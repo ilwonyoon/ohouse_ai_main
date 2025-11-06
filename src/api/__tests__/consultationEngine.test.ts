@@ -10,8 +10,9 @@ import {
   detectIntentSignals,
   detectConversionSignals,
   getPhaseRequirements,
+  calculateVisionClarity,
 } from "../consultationEngine";
-import { ConsultationPhase } from "@/types/consultation";
+import { ConsultationPhase, ImageMetadata } from "@/types/consultation";
 
 // Test runner utilities
 const testResults: { passed: number; failed: number; tests: string[] } = {
@@ -259,6 +260,140 @@ function testEndToEndScenarios(): void {
   assertEqual(result.type, "small_project", "After clarification becomes small project");
 }
 
+// ===== S1.1 IMAGE METADATA TESTS (NEW) =====
+
+function testImageMetadataIntegration(): void {
+  console.log("\n--- S1.1: Image Metadata Integration Tests ---");
+
+  // Test 1: Text-only detection (baseline)
+  console.log("\nTest 1: Text-only intent detection");
+  const textOnlyResult = detectIntentSignals(
+    "I'm thinking about refreshing my bedroom"
+  );
+  assertEqual(textOnlyResult.type, "small_project", "Text-only detects small_project");
+  assertEqual(textOnlyResult.visionClarity, "vague", "Text-only has vague clarity");
+
+  // Test 2: Image with poor lighting + issues
+  console.log("\nTest 2: Image with poor lighting and visible issues");
+  const poorImageMetadata: ImageMetadata = {
+    room_type: "bedroom",
+    lighting_level: "poor",
+    clutter_level: "high",
+    visible_issues: ["dated", "cluttered", "dark"],
+  };
+  const poorImageResult = detectIntentSignals(
+    "just looking around",
+    poorImageMetadata
+  );
+  assertTrue(
+    poorImageResult.confidence > 0.5,
+    "Image metadata boosts confidence from exploratory"
+  );
+  assertEqual(
+    poorImageResult.type,
+    "small_project",
+    "Poor image overrides exploratory to small_project"
+  );
+
+  // Test 3: High quality image with clear room type
+  console.log("\nTest 3: Image with clear metadata");
+  const clearImageMetadata: ImageMetadata = {
+    room_type: "living_room",
+    lighting_level: "excellent",
+    clutter_level: "low",
+    visible_issues: [],
+    estimated_size: "large",
+    style_indicators: ["modern"],
+  };
+  const clearImageResult = detectIntentSignals(
+    "this is nice, but needs some updates",
+    clearImageMetadata
+  );
+  assertEqual(
+    clearImageResult.visionClarity,
+    "emerging",
+    "Clear image with signals gives emerging clarity"
+  );
+
+  // Test 4: Image clarity scoring - clear
+  console.log("\nTest 4: Vision clarity scoring - clear");
+  const clearClarity = calculateVisionClarity(0.8, 3, clearImageMetadata);
+  assertEqual(clearClarity, "clear", "High confidence + 3 signals = clear");
+
+  // Test 5: Image clarity scoring - emerging
+  console.log("\nTest 5: Vision clarity scoring - emerging");
+  const emergingClarity = calculateVisionClarity(0.6, 2, clearImageMetadata);
+  assertEqual(emergingClarity, "emerging", "Medium confidence + image metadata = emerging");
+
+  // Test 6: Image clarity scoring - vague
+  console.log("\nTest 6: Vision clarity scoring - vague");
+  const vagueClarity = calculateVisionClarity(0.3, 0, undefined);
+  assertEqual(vagueClarity, "vague", "Low confidence + no signals = vague");
+
+  // Test 7: Combination text + image signals
+  console.log("\nTest 7: Text + image signal combination");
+  const combinedResult = detectIntentSignals(
+    "I want to renovate my entire home",
+    {
+      room_type: "living_room",
+      visible_issues: ["outdated", "dark"],
+      lighting_level: "poor",
+    }
+  );
+  assertEqual(combinedResult.type, "large_project", "Text intent dominates");
+  assertTrue(
+    combinedResult.signals.length >= 2,
+    "Both text and image signals recorded"
+  );
+
+  // Test 8: Image metadata room type logged
+  console.log("\nTest 8: Image metadata room type tracking");
+  const roomMetaResult = detectIntentSignals("just exploring", {
+    room_type: "kitchen",
+    lighting_level: "moderate",
+  });
+  assertTrue(
+    roomMetaResult.signals.some((s) => s.includes("kitchen")),
+    "Room type is included in signals"
+  );
+
+  // Test 9: Multiple visible issues boost intent
+  console.log("\nTest 9: Multiple visible issues increase confidence");
+  const multiIssueResult = detectIntentSignals("maybe refresh", {
+    visible_issues: ["dated", "cluttered", "dark", "small"],
+    clutter_level: "high",
+    lighting_level: "poor",
+  });
+  assertTrue(
+    multiIssueResult.confidence >= 0.4,
+    "Multiple issues boost confidence significantly"
+  );
+
+  // Test 10: Image with minimal metadata
+  console.log("\nTest 10: Image with minimal metadata");
+  const minimalImageResult = detectIntentSignals("testing", {
+    room_type: "bedroom",
+  });
+  assertEqual(
+    minimalImageResult.visionClarity,
+    "vague",
+    "Minimal image metadata gives vague clarity"
+  );
+
+  // Test 11: No image metadata (existing behavior preserved)
+  console.log("\nTest 11: No image metadata preserves existing behavior");
+  const noImageResult = detectIntentSignals(
+    "renovating multiple rooms and doing major work"
+  );
+  assertEqual(noImageResult.type, "large_project", "Text-only detection works");
+  assertTrue(
+    noImageResult.signals.length > 0,
+    "Text signals still detected"
+  );
+
+  console.log("\n✓ S1.1 Image Metadata Integration Tests Complete");
+}
+
 // ===== EXPORT TEST RUNNER =====
 
 export function runAllTests(): void {
@@ -271,6 +406,7 @@ export function runAllTests(): void {
   testPhaseRequirements();
   testConfidenceScoring();
   testEndToEndScenarios();
+  testImageMetadataIntegration();
 
   // Summary
   console.log("\n====================================");

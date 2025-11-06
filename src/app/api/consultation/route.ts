@@ -41,7 +41,8 @@ export async function POST(request: NextRequest) {
     // 2. Process user response and detect signals
     const processedResponse = await consultationEngine.processUserResponse(
       userMessage,
-      extractedMetadata
+      extractedMetadata,
+      currentPhase || "intent_detection"
     );
 
     // 3. Determine next phase and generate question

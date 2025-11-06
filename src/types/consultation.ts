@@ -27,8 +27,24 @@ export interface ExtractedMetadata {
   constraints?: ConstraintMetadata;
   style?: StyleMetadata;
   functional?: FunctionalMetadata;
+  imageMetadata?: ImageMetadata;
   confidence: number; // 0-1 confidence score for extraction
   rawKeywords: string[];
+}
+
+/**
+ * Image-extracted metadata for visual analysis
+ * Used to enhance intent classification with visual context
+ */
+export interface ImageMetadata {
+  room_type?: string; // "living_room", "bedroom", "kitchen", etc.
+  color_palette?: string[]; // Dominant colors (hex codes)
+  lighting_level?: "poor" | "moderate" | "excellent";
+  clutter_level?: "high" | "medium" | "low";
+  estimated_size?: "small" | "medium" | "large";
+  visible_issues?: string[]; // "dated", "cluttered", "dark", etc.
+  furniture_count?: number;
+  style_indicators?: string[]; // "modern", "vintage", "minimalist", etc.
 }
 
 // ===== PROJECT SCOPE =====
@@ -191,6 +207,9 @@ export type UserIntentType =
   | "small_project"         // Clear small scope (refresh)
   | "medium_project"        // Medium scope (makeover)
   | "large_project";        // Large scope (renovation, full home)
+
+// Vision clarity level for intent scoring
+export type VisionClarityLevel = "clear" | "emerging" | "vague";
 
 // ===== CONSULTATION BRIEF (Output for other agents) =====
 /**

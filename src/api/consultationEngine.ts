@@ -19,6 +19,8 @@ import {
   ConsultantResponse,
   ConsultationMessage,
   UserIntentType,
+  ImageMetadata,
+  VisionClarityLevel,
 } from "@/types/consultation";
 import { extractMetadataFromMessage } from "./metadataExtractor";
 import { logger } from "@/lib/logger";
@@ -297,14 +299,22 @@ const SYNTHESIS_MESSAGES: QuestionPool = {
  * Detect intent signals from user message text
  * Returns the detected intent type and confidence score
  */
-function detectIntentSignals(message: string): {
+/**
+ * Enhanced intent signal detection with optional image metadata
+ * S1.1: Supports both text-based and image-based intent classification
+ */
+function detectIntentSignals(
+  message: string,
+  imageMetadata?: ImageMetadata
+): {
   type: UserIntentType;
   confidence: number;
   signals: string[];
+  visionClarity: VisionClarityLevel;
 } {
   const signals: string[] = [];
 
-  // Check Type D (Large Project) - highest scope
+  // Text-based intent detection
   let typeD_matches = 0;
   INTENT_SIGNALS_TYPE_D.forEach((pattern) => {
     if (pattern.test(message)) {
@@ -313,15 +323,6 @@ function detectIntentSignals(message: string): {
     }
   });
 
-  if (typeD_matches >= 1) {
-    return {
-      type: "large_project",
-      confidence: Math.min(0.95, 0.6 + typeD_matches * 0.15),
-      signals,
-    };
-  }
-
-  // Check Type C (Small Project)
   let typeC_matches = 0;
   INTENT_SIGNALS_TYPE_C.forEach((pattern) => {
     if (pattern.test(message)) {
@@ -330,15 +331,6 @@ function detectIntentSignals(message: string): {
     }
   });
 
-  if (typeC_matches >= 1) {
-    return {
-      type: "small_project",
-      confidence: Math.min(0.95, 0.6 + typeC_matches * 0.15),
-      signals,
-    };
-  }
-
-  // Check Type B (Vague Interest)
   let typeB_matches = 0;
   INTENT_SIGNALS_TYPE_B.forEach((pattern) => {
     if (pattern.test(message)) {
@@ -347,15 +339,6 @@ function detectIntentSignals(message: string): {
     }
   });
 
-  if (typeB_matches >= 1) {
-    return {
-      type: "vague_interest",
-      confidence: Math.min(0.95, 0.6 + typeB_matches * 0.15),
-      signals,
-    };
-  }
-
-  // Check Type A (Exploratory) - default if no other signals
   let typeA_matches = 0;
   INTENT_SIGNALS_TYPE_A.forEach((pattern) => {
     if (pattern.test(message)) {
@@ -364,20 +347,113 @@ function detectIntentSignals(message: string): {
     }
   });
 
-  if (typeA_matches >= 1) {
-    return {
-      type: "exploratory",
-      confidence: Math.min(0.95, 0.6 + typeA_matches * 0.15),
-      signals,
-    };
+  // Image-based intent enhancement (S1.1.2: Image metadata integration)
+  let imageBasedType: UserIntentType | null = null;
+  let imageConfidenceBoost = 0;
+
+  if (imageMetadata) {
+    // Infer intent from image indicators
+    const hasSignificantIssues =
+      imageMetadata.visible_issues &&
+      imageMetadata.visible_issues.length > 0;
+    const isCluttered = imageMetadata.clutter_level === "high";
+    const hasPoorLighting =
+      imageMetadata.lighting_level === "poor";
+
+    if (
+      hasSignificantIssues &&
+      (isCluttered || hasPoorLighting)
+    ) {
+      // Multiple visual issues suggest project intent
+      imageBasedType = "small_project";
+      imageConfidenceBoost = 0.15;
+      signals.push(
+        `Image analysis: ${imageMetadata.visible_issues?.join(", ") || "issues detected"}`
+      );
+    } else if (hasSignificantIssues) {
+      // Some issues indicate interest
+      imageBasedType = "vague_interest";
+      imageConfidenceBoost = 0.1;
+    }
+
+    // Log image metadata for debugging
+    if (imageMetadata.room_type) {
+      signals.push(`Image room type: ${imageMetadata.room_type}`);
+    }
   }
 
-  // Default: exploratory
+  // Determine intent type and base confidence
+  let finalType: UserIntentType = "exploratory";
+  let baseConfidence = 0.3;
+
+  if (typeD_matches >= 1) {
+    finalType = "large_project";
+    baseConfidence = 0.6 + typeD_matches * 0.15;
+  } else if (typeC_matches >= 1) {
+    finalType = "small_project";
+    baseConfidence = 0.6 + typeC_matches * 0.15;
+  } else if (typeB_matches >= 1) {
+    finalType = "vague_interest";
+    baseConfidence = 0.6 + typeB_matches * 0.15;
+  } else if (typeA_matches >= 1) {
+    finalType = "exploratory";
+    baseConfidence = 0.6 + typeA_matches * 0.15;
+  }
+
+  // Apply image-based confidence boost if available
+  let finalConfidence = Math.min(
+    0.95,
+    baseConfidence + imageConfidenceBoost
+  );
+
+  // Override type if image analysis strongly suggests different intent
+  if (imageBasedType && typeA_matches > 0 && !typeD_matches && !typeC_matches) {
+    finalType = imageBasedType;
+  }
+
+  // Calculate vision clarity (S1.1.2: Vision clarity scoring)
+  const visionClarity = calculateVisionClarity(
+    finalConfidence,
+    signals.length,
+    imageMetadata
+  );
+
   return {
-    type: "exploratory",
-    confidence: 0.3,
-    signals: ["No strong signals - treating as exploratory"],
+    type: finalType,
+    confidence: finalConfidence,
+    signals,
+    visionClarity,
   };
+}
+
+/**
+ * Calculate vision clarity score based on confidence, signal count, and image metadata
+ * S1.1.2: Vision clarity scoring (clear | emerging | vague)
+ */
+function calculateVisionClarity(
+  confidence: number,
+  signalCount: number,
+  imageMetadata?: ImageMetadata
+): VisionClarityLevel {
+  // Clear: High confidence + multiple signals + complete image metadata
+  if (confidence >= 0.75) {
+    if (imageMetadata && signalCount >= 2) {
+      return "clear";
+    }
+    if (signalCount >= 3) {
+      return "clear";
+    }
+  }
+
+  // Emerging: Medium confidence + some signals
+  if (confidence >= 0.5) {
+    if (signalCount >= 2 || imageMetadata) {
+      return "emerging";
+    }
+  }
+
+  // Vague: Low confidence or few signals
+  return "vague";
 }
 
 /**
@@ -1059,4 +1135,9 @@ export class ConsultationEngine {
 export const consultationEngine = new ConsultationEngine();
 
 // Export helper functions for testing and external use
-export { detectIntentSignals, detectConversionSignals, getPhaseRequirements };
+export {
+  detectIntentSignals,
+  detectConversionSignals,
+  getPhaseRequirements,
+  calculateVisionClarity,
+};

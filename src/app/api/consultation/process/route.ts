@@ -36,7 +36,8 @@ export async function POST(request: NextRequest) {
     // 2. Process user response and detect conversion signals
     const processedResponse = await consultationEngine.processUserResponse(
       userMessage,
-      extractedMetadata
+      extractedMetadata,
+      currentPhase || "intent_detection"
     );
 
     // 3. Determine if we should transition to next phase

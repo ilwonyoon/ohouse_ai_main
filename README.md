@@ -324,6 +324,7 @@ src/
 
 - **ARCHITECTURE.md** - Detailed system design and data flow
 - **Claude skill files** - Original skill specifications in `/Claude skill` folder
+- **archive/ai-consultant/** - Planning history, checklists, and reports for reference
 
 ## 🔧 Environment Variables
 

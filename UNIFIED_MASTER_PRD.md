@@ -550,8 +550,8 @@ Real product sourcing and purchase integration
 ## 📞 KEY REFERENCES
 
 ### Documentation
-- PHASE1_IMPLEMENTATION_PROGRESS.md - Current progress tracking
-- PRD_PHASE3_TO_7.md - Phase 3-7 detailed specs
+- `archive/ai-consultant/phase-plans/PHASE1_IMPLEMENTATION_PROGRESS.md` - Current progress tracking
+- `archive/ai-consultant/prd/PRD_PHASE3_TO_7.md` - Phase 3-7 detailed specs
 - Interior_ai_agents_plan/ - Master plan from planning phase
 
 ### Code

@@ -284,23 +284,30 @@ export function ConsultationChat({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const staggerTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize consultation on mount
+  // Initialize consultation on first render
   useEffect(() => {
     if (!isInitialized) {
-      // Always initialize fresh consultation, or add greeting if context exists but no messages
-      if (!context || context.messages.length === 0) {
+      console.log("🟢 Initializing consultation...", { context: !!context, messagesCount: context?.messages.length });
+
+      // Check if we need to create a new consultation
+      const needsInitialization = !context || context.messages.length === 0;
+
+      if (needsInitialization) {
+        console.log("🟡 Creating new consultation and adding greeting...");
         const newContext = initializeConsultation(userId);
         if (newContext) {
-          // Add initial assistant message
+          console.log("🟢 Context created, now adding greeting message...");
+          // The addMessage call will trigger a state update
           addMessage("assistant", initialMessage);
           setIsInitialized(true);
         }
       } else {
         // Context exists with messages, just mark as initialized
+        console.log("🔵 Context exists with messages, resuming...");
         setIsInitialized(true);
       }
     }
-  }, [isInitialized, context, initializeConsultation, userId, initialMessage, addMessage]);
+  }, [context, isInitialized, initializeConsultation, userId, initialMessage, addMessage]);
 
   // Auto-scroll to latest message
   useEffect(() => {
@@ -412,7 +419,11 @@ export function ConsultationChat({
 
   // Handle user message submission with streaming
   const handleSendMessage = useCallback(async () => {
-    if (!inputValue.trim() || isStreaming || !context) return;
+    if (!inputValue.trim() || isStreaming) return;
+    if (!context) {
+      console.warn("Context not initialized yet");
+      return;
+    }
 
     const userMessageText = inputValue.trim();
     setInputValue("");
@@ -470,10 +481,6 @@ export function ConsultationChat({
       handleSendMessage();
     }
   };
-
-  if (!context) {
-    return <div>Initializing consultation...</div>;
-  }
 
   return (
     <div style={chatContainerStyle}>

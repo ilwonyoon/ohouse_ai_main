@@ -1,0 +1,944 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "totalImages": 52,
+    "totalStyles": 20,
+    "createdAt": "2025-11-07",
+    "description": "Complete style image library for StyleQuizAgent (Task 1.4.2)"
+  },
+  "styles": {
+    "modern": {
+      "displayName": "Modern",
+      "description": "Clean lines, minimalist approach, contemporary materials",
+      "imageCount": 6,
+      "images": [
+        {
+          "id": "modern_001",
+          "filename": "modern-living-1.jpg",
+          "url": "/images/styles/modern/modern_001.jpg",
+          "roomType": "living_room",
+          "colors": ["white", "gray", "black"],
+          "description": "Minimalist living space with floor-to-ceiling windows"
+        },
+        {
+          "id": "modern_002",
+          "filename": "modern-bedroom-1.jpg",
+          "url": "/images/styles/modern/modern_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["soft_gray", "white"],
+          "description": "Sleek bedroom with platform bed and minimal decor"
+        },
+        {
+          "id": "modern_003",
+          "filename": "modern-kitchen-1.jpg",
+          "url": "/images/styles/modern/modern_003.jpg",
+          "roomType": "kitchen",
+          "colors": ["white", "black", "stainless_steel"],
+          "description": "Contemporary kitchen with island and open shelving"
+        },
+        {
+          "id": "modern_004",
+          "filename": "modern-living-2.jpg",
+          "url": "/images/styles/modern/modern_004.jpg",
+          "roomType": "living_room",
+          "colors": ["charcoal", "white", "accent"],
+          "description": "Monochromatic living room with statement lighting"
+        },
+        {
+          "id": "modern_005",
+          "filename": "modern-office-1.jpg",
+          "url": "/images/styles/modern/modern_005.jpg",
+          "roomType": "home_office",
+          "colors": ["light_gray", "white"],
+          "description": "Minimalist office space with floating desk"
+        },
+        {
+          "id": "modern_006",
+          "filename": "modern-bathroom-1.jpg",
+          "url": "/images/styles/modern/modern_006.jpg",
+          "roomType": "bathroom",
+          "colors": ["white", "subway_tile"],
+          "description": "Clean modern bathroom with geometric fixtures"
+        }
+      ]
+    },
+    "contemporary": {
+      "displayName": "Contemporary",
+      "description": "Current trends, mixed materials, eclectic elements",
+      "imageCount": 5,
+      "images": [
+        {
+          "id": "contemporary_001",
+          "filename": "contemporary-living-1.jpg",
+          "url": "/images/styles/contemporary/contemporary_001.jpg",
+          "roomType": "living_room",
+          "colors": ["gray", "navy", "accent"],
+          "description": "Mixed textures with bold accent wall"
+        },
+        {
+          "id": "contemporary_002",
+          "filename": "contemporary-bedroom-1.jpg",
+          "url": "/images/styles/contemporary/contemporary_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["warm_neutral", "brass"],
+          "description": "Contemporary bedroom with mixed metal finishes"
+        },
+        {
+          "id": "contemporary_003",
+          "filename": "contemporary-kitchen-1.jpg",
+          "url": "/images/styles/contemporary/contemporary_003.jpg",
+          "roomType": "kitchen",
+          "colors": ["light_oak", "white", "gray"],
+          "description": "Contemporary kitchen with natural wood elements"
+        },
+        {
+          "id": "contemporary_004",
+          "filename": "contemporary-living-2.jpg",
+          "url": "/images/styles/contemporary/contemporary_004.jpg",
+          "roomType": "living_room",
+          "colors": ["terracotta", "cream", "green"],
+          "description": "Warm contemporary space with layered textures"
+        },
+        {
+          "id": "contemporary_005",
+          "filename": "contemporary-dining-1.jpg",
+          "url": "/images/styles/contemporary/contemporary_005.jpg",
+          "roomType": "dining_room",
+          "colors": ["sage", "cream", "wood"],
+          "description": "Contemporary dining with organic shapes"
+        }
+      ]
+    },
+    "traditional": {
+      "displayName": "Traditional",
+      "description": "Classic, formal, ornate designs with historical references",
+      "imageCount": 6,
+      "images": [
+        {
+          "id": "traditional_001",
+          "filename": "traditional-living-1.jpg",
+          "url": "/images/styles/traditional/traditional_001.jpg",
+          "roomType": "living_room",
+          "colors": ["burgundy", "gold", "cream"],
+          "description": "Formal living room with crown molding and chandelier"
+        },
+        {
+          "id": "traditional_002",
+          "filename": "traditional-bedroom-1.jpg",
+          "url": "/images/styles/traditional/traditional_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["deep_blue", "floral", "ivory"],
+          "description": "Traditional bedroom with patterned curtains"
+        },
+        {
+          "id": "traditional_003",
+          "filename": "traditional-dining-1.jpg",
+          "url": "/images/styles/traditional/traditional_003.jpg",
+          "roomType": "dining_room",
+          "colors": ["rich_brown", "gold"],
+          "description": "Formal dining with traditional furniture"
+        },
+        {
+          "id": "traditional_004",
+          "filename": "traditional-library-1.jpg",
+          "url": "/images/styles/traditional/traditional_004.jpg",
+          "roomType": "library",
+          "colors": ["dark_wood", "burgundy"],
+          "description": "Traditional study with built-in bookshelves"
+        },
+        {
+          "id": "traditional_005",
+          "filename": "traditional-living-2.jpg",
+          "url": "/images/styles/traditional/traditional_005.jpg",
+          "roomType": "living_room",
+          "colors": ["cream", "jewel_tones"],
+          "description": "Ornate traditional space with detailed fabrics"
+        },
+        {
+          "id": "traditional_006",
+          "filename": "traditional-bedroom-2.jpg",
+          "url": "/images/styles/traditional/traditional_006.jpg",
+          "roomType": "bedroom",
+          "colors": ["paisley", "cream", "wood"],
+          "description": "Detailed traditional bedroom with layers"
+        }
+      ]
+    },
+    "minimalist": {
+      "displayName": "Minimalist",
+      "description": "Extreme simplicity focusing on essential elements only",
+      "imageCount": 6,
+      "images": [
+        {
+          "id": "minimalist_001",
+          "filename": "minimalist-living-1.jpg",
+          "url": "/images/styles/minimalist/minimalist_001.jpg",
+          "roomType": "living_room",
+          "colors": ["white", "off_white"],
+          "description": "Sparse living room with function-only elements"
+        },
+        {
+          "id": "minimalist_002",
+          "filename": "minimalist-bedroom-1.jpg",
+          "url": "/images/styles/minimalist/minimalist_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["white", "light_gray"],
+          "description": "Minimalist bedroom with essential furniture"
+        },
+        {
+          "id": "minimalist_003",
+          "filename": "minimalist-kitchen-1.jpg",
+          "url": "/images/styles/minimalist/minimalist_003.jpg",
+          "roomType": "kitchen",
+          "colors": ["white", "stainless_steel"],
+          "description": "Minimal kitchen with hidden storage"
+        },
+        {
+          "id": "minimalist_004",
+          "filename": "minimalist-office-1.jpg",
+          "url": "/images/styles/minimalist/minimalist_004.jpg",
+          "roomType": "home_office",
+          "colors": ["white", "wood"],
+          "description": "Zen minimal office with single desk"
+        },
+        {
+          "id": "minimalist_005",
+          "filename": "minimalist-bathroom-1.jpg",
+          "url": "/images/styles/minimalist/minimalist_005.jpg",
+          "roomType": "bathroom",
+          "colors": ["white", "concrete"],
+          "description": "Minimal bathroom with clean lines"
+        },
+        {
+          "id": "minimalist_006",
+          "filename": "minimalist-living-2.jpg",
+          "url": "/images/styles/minimalist/minimalist_006.jpg",
+          "roomType": "living_room",
+          "colors": ["neutral", "single_accent"],
+          "description": "Ultra-minimal living with one focal point"
+        }
+      ]
+    },
+    "rustic": {
+      "displayName": "Rustic",
+      "description": "Natural, weathered materials with farmhouse elements",
+      "imageCount": 5,
+      "images": [
+        {
+          "id": "rustic_001",
+          "filename": "rustic-living-1.jpg",
+          "url": "/images/styles/rustic/rustic_001.jpg",
+          "roomType": "living_room",
+          "colors": ["natural_wood", "brown", "cream"],
+          "description": "Cozy rustic living with exposed beams"
+        },
+        {
+          "id": "rustic_002",
+          "filename": "rustic-kitchen-1.jpg",
+          "url": "/images/styles/rustic/rustic_002.jpg",
+          "roomType": "kitchen",
+          "colors": ["wood", "stone", "warm_tones"],
+          "description": "Rustic kitchen with natural materials"
+        },
+        {
+          "id": "rustic_003",
+          "filename": "rustic-bedroom-1.jpg",
+          "url": "/images/styles/rustic/rustic_003.jpg",
+          "roomType": "bedroom",
+          "colors": ["warm_wood", "earth_tones"],
+          "description": "Rustic bedroom with weathered finishes"
+        },
+        {
+          "id": "rustic_004",
+          "filename": "rustic-dining-1.jpg",
+          "url": "/images/styles/rustic/rustic_004.jpg",
+          "roomType": "dining_room",
+          "colors": ["dark_wood", "natural_stone"],
+          "description": "Rustic dining with authentic character"
+        },
+        {
+          "id": "rustic_005",
+          "filename": "rustic-living-2.jpg",
+          "url": "/images/styles/rustic/rustic_005.jpg",
+          "roomType": "living_room",
+          "colors": ["earthy_palette", "natural"],
+          "description": "Warm rustic space with natural textures"
+        }
+      ]
+    },
+    "scandinavian": {
+      "displayName": "Scandinavian",
+      "description": "Light woods, functional design, cozy hygge",
+      "imageCount": 6,
+      "images": [
+        {
+          "id": "scandinavian_001",
+          "filename": "scandinavian-living-1.jpg",
+          "url": "/images/styles/scandinavian/scandinavian_001.jpg",
+          "roomType": "living_room",
+          "colors": ["light_wood", "white", "gray"],
+          "description": "Scandinavian living with natural light"
+        },
+        {
+          "id": "scandinavian_002",
+          "filename": "scandinavian-bedroom-1.jpg",
+          "url": "/images/styles/scandinavian/scandinavian_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["soft_white", "light_wood"],
+          "description": "Cozy scandinavian bedroom with hygge"
+        },
+        {
+          "id": "scandinavian_003",
+          "filename": "scandinavian-kitchen-1.jpg",
+          "url": "/images/styles/scandinavian/scandinavian_003.jpg",
+          "roomType": "kitchen",
+          "colors": ["white", "light_wood"],
+          "description": "Functional scandinavian kitchen"
+        },
+        {
+          "id": "scandinavian_004",
+          "filename": "scandinavian-living-2.jpg",
+          "url": "/images/styles/scandinavian/scandinavian_004.jpg",
+          "roomType": "living_room",
+          "colors": ["neutral", "light_accents"],
+          "description": "Minimalist scandinavian with cozy elements"
+        },
+        {
+          "id": "scandinavian_005",
+          "filename": "scandinavian-office-1.jpg",
+          "url": "/images/styles/scandinavian/scandinavian_005.jpg",
+          "roomType": "home_office",
+          "colors": ["light_wood", "white"],
+          "description": "Scandinavian workspace with function"
+        },
+        {
+          "id": "scandinavian_006",
+          "filename": "scandinavian-dining-1.jpg",
+          "url": "/images/styles/scandinavian/scandinavian_006.jpg",
+          "roomType": "dining_room",
+          "colors": ["light_wood", "neutral"],
+          "description": "Scandinavian dining with natural materials"
+        }
+      ]
+    },
+    "bohemian": {
+      "displayName": "Bohemian",
+      "description": "Eclectic, global, artistic, and laid-back",
+      "imageCount": 5,
+      "images": [
+        {
+          "id": "bohemian_001",
+          "filename": "bohemian-living-1.jpg",
+          "url": "/images/styles/bohemian/bohemian_001.jpg",
+          "roomType": "living_room",
+          "colors": ["multicolor", "warm"],
+          "description": "Eclectic bohemian with global influences"
+        },
+        {
+          "id": "bohemian_002",
+          "filename": "bohemian-bedroom-1.jpg",
+          "url": "/images/styles/bohemian/bohemian_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["warm_tones", "patterns"],
+          "description": "Bohemian bedroom with layered textiles"
+        },
+        {
+          "id": "bohemian_003",
+          "filename": "bohemian-living-2.jpg",
+          "url": "/images/styles/bohemian/bohemian_003.jpg",
+          "roomType": "living_room",
+          "colors": ["colorful", "earth_tones"],
+          "description": "Artistic bohemian space with collected pieces"
+        },
+        {
+          "id": "bohemian_004",
+          "filename": "bohemian-entryway-1.jpg",
+          "url": "/images/styles/bohemian/bohemian_004.jpg",
+          "roomType": "entryway",
+          "colors": ["multicolor", "warm"],
+          "description": "Bohemian entryway with global art"
+        },
+        {
+          "id": "bohemian_005",
+          "filename": "bohemian-bedroom-2.jpg",
+          "url": "/images/styles/bohemian/bohemian_005.jpg",
+          "roomType": "bedroom",
+          "colors": ["vibrant", "patterns"],
+          "description": "Free-spirited bohemian with personality"
+        }
+      ]
+    },
+    "industrial": {
+      "displayName": "Industrial",
+      "description": "Exposed brick, metal, and warehouse vibes",
+      "imageCount": 5,
+      "images": [
+        {
+          "id": "industrial_001",
+          "filename": "industrial-loft-1.jpg",
+          "url": "/images/styles/industrial/industrial_001.jpg",
+          "roomType": "living_room",
+          "colors": ["brick", "metal", "concrete"],
+          "description": "Industrial loft with exposed brick"
+        },
+        {
+          "id": "industrial_002",
+          "filename": "industrial-kitchen-1.jpg",
+          "url": "/images/styles/industrial/industrial_002.jpg",
+          "roomType": "kitchen",
+          "colors": ["metal", "concrete", "wood"],
+          "description": "Industrial kitchen with raw materials"
+        },
+        {
+          "id": "industrial_003",
+          "filename": "industrial-bedroom-1.jpg",
+          "url": "/images/styles/industrial/industrial_003.jpg",
+          "roomType": "bedroom",
+          "colors": ["gray", "metal", "wood"],
+          "description": "Industrial bedroom with metal fixtures"
+        },
+        {
+          "id": "industrial_004",
+          "filename": "industrial-office-1.jpg",
+          "url": "/images/styles/industrial/industrial_004.jpg",
+          "roomType": "home_office",
+          "colors": ["metal", "wood", "neutral"],
+          "description": "Industrial workspace with functional design"
+        },
+        {
+          "id": "industrial_005",
+          "filename": "industrial-loft-2.jpg",
+          "url": "/images/styles/industrial/industrial_005.jpg",
+          "roomType": "living_room",
+          "colors": ["exposed_brick", "metal"],
+          "description": "Raw industrial space with loft character"
+        }
+      ]
+    },
+    "mid_century_modern": {
+      "displayName": "Mid-Century Modern",
+      "description": "1950s-60s influence with iconic furniture",
+      "imageCount": 5,
+      "images": [
+        {
+          "id": "mcm_001",
+          "filename": "mcm-living-1.jpg",
+          "url": "/images/styles/mid_century_modern/mcm_001.jpg",
+          "roomType": "living_room",
+          "colors": ["warm_wood", "retro", "accent"],
+          "description": "Mid-century living with iconic furniture"
+        },
+        {
+          "id": "mcm_002",
+          "filename": "mcm-bedroom-1.jpg",
+          "url": "/images/styles/mid_century_modern/mcm_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["teak", "warm_tones"],
+          "description": "MCM bedroom with vintage modern"
+        },
+        {
+          "id": "mcm_003",
+          "filename": "mcm-dining-1.jpg",
+          "url": "/images/styles/mid_century_modern/mcm_003.jpg",
+          "roomType": "dining_room",
+          "colors": ["wood", "retro_colors"],
+          "description": "Mid-century dining with classic lines"
+        },
+        {
+          "id": "mcm_004",
+          "filename": "mcm-office-1.jpg",
+          "url": "/images/styles/mid_century_modern/mcm_004.jpg",
+          "roomType": "home_office",
+          "colors": ["wood", "warm"],
+          "description": "MCM workspace with vintage character"
+        },
+        {
+          "id": "mcm_005",
+          "filename": "mcm-living-2.jpg",
+          "url": "/images/styles/mid_century_modern/mcm_005.jpg",
+          "roomType": "living_room",
+          "colors": ["teak_wood", "retro"],
+          "description": "Retro modern with geometric forms"
+        }
+      ]
+    },
+    "coastal": {
+      "displayName": "Coastal",
+      "description": "Beachy, nautical, and light. Breezy and serene",
+      "imageCount": 5,
+      "images": [
+        {
+          "id": "coastal_001",
+          "filename": "coastal-living-1.jpg",
+          "url": "/images/styles/coastal/coastal_001.jpg",
+          "roomType": "living_room",
+          "colors": ["blue", "white", "natural"],
+          "description": "Coastal living with nautical elements"
+        },
+        {
+          "id": "coastal_002",
+          "filename": "coastal-bedroom-1.jpg",
+          "url": "/images/styles/coastal/coastal_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["light_blue", "white"],
+          "description": "Breezy coastal bedroom"
+        },
+        {
+          "id": "coastal_003",
+          "filename": "coastal-kitchen-1.jpg",
+          "url": "/images/styles/coastal/coastal_003.jpg",
+          "roomType": "kitchen",
+          "colors": ["white", "light_blue", "natural"],
+          "description": "Coastal kitchen with airy feel"
+        },
+        {
+          "id": "coastal_004",
+          "filename": "coastal-bathroom-1.jpg",
+          "url": "/images/styles/coastal/coastal_004.jpg",
+          "roomType": "bathroom",
+          "colors": ["white", "light_blue"],
+          "description": "Coastal bathroom with spa vibes"
+        },
+        {
+          "id": "coastal_005",
+          "filename": "coastal-entryway-1.jpg",
+          "url": "/images/styles/coastal/coastal_005.jpg",
+          "roomType": "entryway",
+          "colors": ["nautical", "natural"],
+          "description": "Relaxed coastal entryway"
+        }
+      ]
+    },
+    "glam": {
+      "displayName": "Glam",
+      "description": "Luxurious, bold, and metallic statement pieces",
+      "imageCount": 4,
+      "images": [
+        {
+          "id": "glam_001",
+          "filename": "glam-living-1.jpg",
+          "url": "/images/styles/glam/glam_001.jpg",
+          "roomType": "living_room",
+          "colors": ["metallic", "jewel_tones", "luxe"],
+          "description": "Glam living with metallic accents"
+        },
+        {
+          "id": "glam_002",
+          "filename": "glam-bedroom-1.jpg",
+          "url": "/images/styles/glam/glam_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["gold", "jewel_tones"],
+          "description": "Glamorous bedroom with velvet and gold"
+        },
+        {
+          "id": "glam_003",
+          "filename": "glam-dining-1.jpg",
+          "url": "/images/styles/glam/glam_003.jpg",
+          "roomType": "dining_room",
+          "colors": ["gold", "black", "crystal"],
+          "description": "Glam dining with statement chandelier"
+        },
+        {
+          "id": "glam_004",
+          "filename": "glam-entryway-1.jpg",
+          "url": "/images/styles/glam/glam_004.jpg",
+          "roomType": "entryway",
+          "colors": ["metallic", "luxe"],
+          "description": "Glamorous entryway with luxury finishes"
+        }
+      ]
+    },
+    "gothic": {
+      "displayName": "Gothic",
+      "description": "Dark, moody, dramatic design with vintage elements",
+      "imageCount": 3,
+      "images": [
+        {
+          "id": "gothic_001",
+          "filename": "gothic-living-1.jpg",
+          "url": "/images/styles/gothic/gothic_001.jpg",
+          "roomType": "living_room",
+          "colors": ["dark", "dramatic", "vintage"],
+          "description": "Gothic living with dark sophisticated mood"
+        },
+        {
+          "id": "gothic_002",
+          "filename": "gothic-bedroom-1.jpg",
+          "url": "/images/styles/gothic/gothic_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["dark_colors", "ornate"],
+          "description": "Gothic bedroom with dramatic atmosphere"
+        },
+        {
+          "id": "gothic_003",
+          "filename": "gothic-library-1.jpg",
+          "url": "/images/styles/gothic/gothic_003.jpg",
+          "roomType": "library",
+          "colors": ["dark_wood", "vintage"],
+          "description": "Gothic library with moody elegance"
+        }
+      ]
+    },
+    "farmhouse": {
+      "displayName": "Farmhouse",
+      "description": "Rural aesthetic with vintage elements and country charm",
+      "imageCount": 5,
+      "images": [
+        {
+          "id": "farmhouse_001",
+          "filename": "farmhouse-living-1.jpg",
+          "url": "/images/styles/farmhouse/farmhouse_001.jpg",
+          "roomType": "living_room",
+          "colors": ["white", "cream", "natural"],
+          "description": "Farmhouse living with shiplap walls"
+        },
+        {
+          "id": "farmhouse_002",
+          "filename": "farmhouse-kitchen-1.jpg",
+          "url": "/images/styles/farmhouse/farmhouse_002.jpg",
+          "roomType": "kitchen",
+          "colors": ["cream", "white", "wood"],
+          "description": "Farmhouse kitchen with barn doors"
+        },
+        {
+          "id": "farmhouse_003",
+          "filename": "farmhouse-bedroom-1.jpg",
+          "url": "/images/styles/farmhouse/farmhouse_003.jpg",
+          "roomType": "bedroom",
+          "colors": ["cream", "soft_tones"],
+          "description": "Farmhouse bedroom with vintage charm"
+        },
+        {
+          "id": "farmhouse_004",
+          "filename": "farmhouse-dining-1.jpg",
+          "url": "/images/styles/farmhouse/farmhouse_004.jpg",
+          "roomType": "dining_room",
+          "colors": ["natural", "cream"],
+          "description": "Farmhouse dining with country appeal"
+        },
+        {
+          "id": "farmhouse_005",
+          "filename": "farmhouse-entryway-1.jpg",
+          "url": "/images/styles/farmhouse/farmhouse_005.jpg",
+          "roomType": "entryway",
+          "colors": ["white", "natural"],
+          "description": "Farmhouse entryway with practical design"
+        }
+      ]
+    },
+    "transitional": {
+      "displayName": "Transitional",
+      "description": "Blends modern and traditional elements",
+      "imageCount": 4,
+      "images": [
+        {
+          "id": "transitional_001",
+          "filename": "transitional-living-1.jpg",
+          "url": "/images/styles/transitional/transitional_001.jpg",
+          "roomType": "living_room",
+          "colors": ["cream", "taupe", "brass"],
+          "description": "Transitional living mixing classic and modern"
+        },
+        {
+          "id": "transitional_002",
+          "filename": "transitional-bedroom-1.jpg",
+          "url": "/images/styles/transitional/transitional_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["neutral", "classic"],
+          "description": "Transitional bedroom with balanced elements"
+        },
+        {
+          "id": "transitional_003",
+          "filename": "transitional-dining-1.jpg",
+          "url": "/images/styles/transitional/transitional_003.jpg",
+          "roomType": "dining_room",
+          "colors": ["white", "wood", "metal"],
+          "description": "Transitional dining mixing styles"
+        },
+        {
+          "id": "transitional_004",
+          "filename": "transitional-living-2.jpg",
+          "url": "/images/styles/transitional/transitional_004.jpg",
+          "roomType": "living_room",
+          "colors": ["soft_gray", "cream"],
+          "description": "Balanced transitional space with elegance"
+        }
+      ]
+    },
+    "eclectic": {
+      "displayName": "Eclectic",
+      "description": "Mixed styles, collected pieces, and personal expression",
+      "imageCount": 4,
+      "images": [
+        {
+          "id": "eclectic_001",
+          "filename": "eclectic-living-1.jpg",
+          "url": "/images/styles/eclectic/eclectic_001.jpg",
+          "roomType": "living_room",
+          "colors": ["mixed", "colorful"],
+          "description": "Eclectic living with mixed styles"
+        },
+        {
+          "id": "eclectic_002",
+          "filename": "eclectic-bedroom-1.jpg",
+          "url": "/images/styles/eclectic/eclectic_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["mixed_patterns", "warm"],
+          "description": "Eclectic bedroom with personal pieces"
+        },
+        {
+          "id": "eclectic_003",
+          "filename": "eclectic-living-2.jpg",
+          "url": "/images/styles/eclectic/eclectic_003.jpg",
+          "roomType": "living_room",
+          "colors": ["colorful", "collected"],
+          "description": "Uniquely curated eclectic space"
+        },
+        {
+          "id": "eclectic_004",
+          "filename": "eclectic-office-1.jpg",
+          "url": "/images/styles/eclectic/eclectic_004.jpg",
+          "roomType": "home_office",
+          "colors": ["mixed", "personal"],
+          "description": "Eclectic workspace with individual story"
+        }
+      ]
+    },
+    "maximalist": {
+      "displayName": "Maximalist",
+      "description": "Bold, layered, pattern-heavy designs",
+      "imageCount": 4,
+      "images": [
+        {
+          "id": "maximalist_001",
+          "filename": "maximalist-living-1.jpg",
+          "url": "/images/styles/maximalist/maximalist_001.jpg",
+          "roomType": "living_room",
+          "colors": ["bold_patterns", "rich_colors"],
+          "description": "Maximalist living with bold patterns"
+        },
+        {
+          "id": "maximalist_002",
+          "filename": "maximalist-bedroom-1.jpg",
+          "url": "/images/styles/maximalist/maximalist_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["layered", "vibrant"],
+          "description": "Maximalist bedroom with layered textures"
+        },
+        {
+          "id": "maximalist_003",
+          "filename": "maximalist-living-2.jpg",
+          "url": "/images/styles/maximalist/maximalist_003.jpg",
+          "roomType": "living_room",
+          "colors": ["pattern_heavy", "collected"],
+          "description": "Abundant maximalist with personal expression"
+        },
+        {
+          "id": "maximalist_004",
+          "filename": "maximalist-entryway-1.jpg",
+          "url": "/images/styles/maximalist/maximalist_004.jpg",
+          "roomType": "entryway",
+          "colors": ["bold", "artistic"],
+          "description": "Bold maximalist statement entryway"
+        }
+      ]
+    },
+    "victorian": {
+      "displayName": "Victorian",
+      "description": "Ornate, heavy fabrics, and historical period influence",
+      "imageCount": 4,
+      "images": [
+        {
+          "id": "victorian_001",
+          "filename": "victorian-living-1.jpg",
+          "url": "/images/styles/victorian/victorian_001.jpg",
+          "roomType": "living_room",
+          "colors": ["jewel_tones", "gold", "dark"],
+          "description": "Victorian living with ornate details"
+        },
+        {
+          "id": "victorian_002",
+          "filename": "victorian-bedroom-1.jpg",
+          "url": "/images/styles/victorian/victorian_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["rich_colors", "heavy_drapery"],
+          "description": "Victorian bedroom with period furniture"
+        },
+        {
+          "id": "victorian_003",
+          "filename": "victorian-dining-1.jpg",
+          "url": "/images/styles/victorian/victorian_003.jpg",
+          "roomType": "dining_room",
+          "colors": ["dark_wood", "ornate"],
+          "description": "Victorian dining with dramatic elegance"
+        },
+        {
+          "id": "victorian_004",
+          "filename": "victorian-parlor-1.jpg",
+          "url": "/images/styles/victorian/victorian_004.jpg",
+          "roomType": "parlor",
+          "colors": ["jewel_tones", "detailed"],
+          "description": "Victorian parlor with historical character"
+        }
+      ]
+    },
+    "southwest": {
+      "displayName": "Southwest",
+      "description": "Earth tones, cultural patterns, and terra cotta",
+      "imageCount": 4,
+      "images": [
+        {
+          "id": "southwest_001",
+          "filename": "southwest-living-1.jpg",
+          "url": "/images/styles/southwest/southwest_001.jpg",
+          "roomType": "living_room",
+          "colors": ["earth_tones", "terra_cotta"],
+          "description": "Southwest living with cultural patterns"
+        },
+        {
+          "id": "southwest_002",
+          "filename": "southwest-kitchen-1.jpg",
+          "url": "/images/styles/southwest/southwest_002.jpg",
+          "roomType": "kitchen",
+          "colors": ["terra_cotta", "natural"],
+          "description": "Southwest kitchen with handcrafted elements"
+        },
+        {
+          "id": "southwest_003",
+          "filename": "southwest-bedroom-1.jpg",
+          "url": "/images/styles/southwest/southwest_003.jpg",
+          "roomType": "bedroom",
+          "colors": ["warm_earth", "woven"],
+          "description": "Southwest bedroom with textile richness"
+        },
+        {
+          "id": "southwest_004",
+          "filename": "southwest-entryway-1.jpg",
+          "url": "/images/styles/southwest/southwest_004.jpg",
+          "roomType": "entryway",
+          "colors": ["earth_tones", "cultural"],
+          "description": "Southwest entryway with artistic warmth"
+        }
+      ]
+    },
+    "asian_inspired": {
+      "displayName": "Asian-Inspired",
+      "description": "Zen, natural materials, and balance",
+      "imageCount": 5,
+      "images": [
+        {
+          "id": "asian_001",
+          "filename": "asian-living-1.jpg",
+          "url": "/images/styles/asian_inspired/asian_001.jpg",
+          "roomType": "living_room",
+          "colors": ["natural", "neutral", "zen"],
+          "description": "Asian-inspired living with zen principles"
+        },
+        {
+          "id": "asian_002",
+          "filename": "asian-bedroom-1.jpg",
+          "url": "/images/styles/asian_inspired/asian_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["natural_materials", "calm"],
+          "description": "Asian bedroom with balance and harmony"
+        },
+        {
+          "id": "asian_003",
+          "filename": "asian-meditation-1.jpg",
+          "url": "/images/styles/asian_inspired/asian_003.jpg",
+          "roomType": "meditation_room",
+          "colors": ["neutral", "natural"],
+          "description": "Zen meditation space with nature connection"
+        },
+        {
+          "id": "asian_004",
+          "filename": "asian-kitchen-1.jpg",
+          "url": "/images/styles/asian_inspired/asian_004.jpg",
+          "roomType": "kitchen",
+          "colors": ["natural", "wood"],
+          "description": "Asian-inspired kitchen with minimal elements"
+        },
+        {
+          "id": "asian_005",
+          "filename": "asian-garden-1.jpg",
+          "url": "/images/styles/asian_inspired/asian_005.jpg",
+          "roomType": "outdoor",
+          "colors": ["natural", "green"],
+          "description": "Zen garden with balanced landscape"
+        }
+      ]
+    },
+    "art_deco": {
+      "displayName": "Art Deco",
+      "description": "Geometric, bold colors, luxe finishes. 1920s-30s influence",
+      "imageCount": 4,
+      "images": [
+        {
+          "id": "deco_001",
+          "filename": "deco-living-1.jpg",
+          "url": "/images/styles/art_deco/deco_001.jpg",
+          "roomType": "living_room",
+          "colors": ["geometric", "bold", "luxe"],
+          "description": "Art Deco living with geometric patterns"
+        },
+        {
+          "id": "deco_002",
+          "filename": "deco-bedroom-1.jpg",
+          "url": "/images/styles/art_deco/deco_002.jpg",
+          "roomType": "bedroom",
+          "colors": ["metallic", "bold_colors"],
+          "description": "Art Deco bedroom with glamorous finish"
+        },
+        {
+          "id": "deco_003",
+          "filename": "deco-dining-1.jpg",
+          "url": "/images/styles/art_deco/deco_003.jpg",
+          "roomType": "dining_room",
+          "colors": ["gold", "black", "geometric"],
+          "description": "Art Deco dining with symmetrical design"
+        },
+        {
+          "id": "deco_004",
+          "filename": "deco-bathroom-1.jpg",
+          "url": "/images/styles/art_deco/deco_004.jpg",
+          "roomType": "bathroom",
+          "colors": ["black", "white", "gold"],
+          "description": "Art Deco bathroom with luxe elegance"
+        }
+      ]
+    }
+  },
+  "quizPairings": {
+    "description": "Recommended image pairings for quiz questions",
+    "examples": [
+      {
+        "category": "overall_style",
+        "difficulty": "easy",
+        "imageA": "modern_001",
+        "imageB": "rustic_001",
+        "contrast": "Very different: Clean lines vs natural weathered"
+      },
+      {
+        "category": "overall_style",
+        "difficulty": "medium",
+        "imageA": "modern_001",
+        "imageB": "contemporary_001",
+        "contrast": "Similar: Both current but different emphasis"
+      },
+      {
+        "category": "color_palette",
+        "difficulty": "medium",
+        "imageA": "bohemian_001",
+        "imageB": "coastal_001",
+        "contrast": "Color temperature: Warm vs Cool"
+      },
+      {
+        "category": "materials",
+        "difficulty": "hard",
+        "imageA": "asian_001",
+        "imageB": "industrial_001",
+        "contrast": "Subtle: Natural vs Synthetic materials"
+      }
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Test
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: Test Suite
+    name: Run Tests
 
     steps:
       - name: Checkout code
@@ -24,18 +24,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
+      - name: Run test suite
         run: node test_agent_14.js
         continue-on-error: true
 
-  notify:
-    runs-on: ubuntu-latest
-    name: Workflow Status
-    if: always()
-    needs: [test]
-
-    steps:
-      - name: Check workflow status
-        run: |
-          echo "✅ CI/CD Pipeline Completed"
-          echo "Test Status: ${{ needs.test.result }}"
+      - name: Test summary
+        if: always()
+        run: echo "✅ Test suite executed"

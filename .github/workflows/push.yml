@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  status:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,16 +18,20 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Check environment
-        run: |
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "Current dir: $(pwd)"
-          echo "Files in current dir:"
-          ls -la | head -20
-
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Run tests
+        run: node test_agent_14.js
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
       - name: Success marker
-        run: echo "✅ Workflow completed successfully"
+        run: echo "✅ All checks passed!"

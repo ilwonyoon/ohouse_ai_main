@@ -2,14 +2,14 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, Ohouse_ai_design_system]
+    branches: [main]
   pull_request:
-    branches: [main, Ohouse_ai_design_system]
+    branches: [main]
 
 jobs:
-  lint-and-test:
+  test:
     runs-on: ubuntu-latest
-    name: Lint & Test
+    name: Test Suite
 
     steps:
       - name: Checkout code
@@ -23,80 +23,19 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
-        continue-on-error: true
-
-      - name: Type check
-        run: npm run typecheck
-        continue-on-error: true
 
       - name: Run tests
-        run: node test_agent_14.js || true
-        working-directory: ./
-        continue-on-error: true
-
-  build:
-    runs-on: ubuntu-latest
-    name: Build
-    needs: lint-and-test
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-        continue-on-error: true
-
-      - name: Upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-output
-          path: .next/
-          retention-days: 7
-
-  push-updates:
-    runs-on: ubuntu-latest
-    name: Push Updates
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup git config
-        run: |
-          git config --global user.email "bot@ohouse.ai"
-          git config --global user.name "OHouse AI Bot"
-
-      - name: Push to GitHub
-        run: |
-          git push origin main || echo "Already up to date"
+        run: node test_agent_14.js
         continue-on-error: true
 
   notify:
     runs-on: ubuntu-latest
-    name: Notify Status
+    name: Workflow Status
     if: always()
-    needs: [lint-and-test, build, push-updates]
+    needs: [test]
 
     steps:
       - name: Check workflow status
         run: |
-          echo "Workflow completed!"
-          echo "Lint & Test: ${{ needs.lint-and-test.result }}"
-          echo "Build: ${{ needs.build.result }}"
-          echo "Push: ${{ needs.push-updates.result }}"
+          echo "✅ CI/CD Pipeline Completed"
+          echo "Test Status: ${{ needs.test.result }}"

@@ -20,18 +20,18 @@ For VisionBuilderAgent moodboard generation, we need:
 
 ## 📊 API Comparison Matrix
 
-| Feature | DALL-E 3 | Stable Diffusion | Midjourney |
-|---------|----------|------------------|-----------|
-| **Integration** | ✅ OpenAI SDK (same auth) | ⚠️ Self-host or third-party | ⚠️ Discord bot / API (complex) |
-| **Interior Design Quality** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Style Control** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Setup Time** | <10 min ✅ | 1-3 hours | 30 min (complex) |
-| **Cost per Image** | ~$0.08 (1024x1024) | ~$0.003-0.02 | $0.30-0.65 (per 4 images) |
-| **Speed** | 10-30 seconds ✅ | 5-15 seconds ✅ | 30-60 seconds |
-| **API Documentation** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **Rate Limits** | 500 requests/min ✅ | Depends on provider | 30 generations/min |
-| **Reliability** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Best For** | Quick integration | Custom control | Quality output |
+| Feature | DALL-E 3 | Stable Diffusion | Hugging Face Free | Replicate API |
+|---------|----------|------------------|-------------------|---------------|
+| **API Key Required** | ✅ OpenAI (paid) | ✅ Free HF token | ✅ FREE Hugging Face | ⚠️ Replicate (free tier) |
+| **Integration** | ✅ OpenAI SDK | ✅ Transformers lib | ✅ Inference API | ✅ REST API |
+| **Interior Design Quality** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Style Control** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **Setup Time** | <10 min | <5 min | <2 min ✅ | <5 min |
+| **Cost per Image** | ~$0.08 | FREE/$0.003-0.02 | FREE ✅ | FREE/1 credit |
+| **Speed** | 10-30s | 5-15s | 30-60s | 5-15s |
+| **Rate Limits** | 500 req/min | Depends | 2 concurrent | Free tier limited |
+| **Reliability** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Best For** | Production | Max control | **FREE option** | **FREE + quality** |
 
 ---
 
@@ -148,12 +148,106 @@ Week 2-3: Optional - Add Stable Diffusion fallback for cost savings
 Future: Monitor new APIs (Claude Vision API improvements, etc.)
 ```
 
-### **SECONDARY CHOICE (Optional Future): Stable Diffusion**
+### **ALTERNATIVE 1: Hugging Face Inference API (100% FREE)**
 
-Use if:
-- Cost becomes major issue (high volume of users)
-- Need maximum customization
-- Can allocate time for self-hosting or complex integration
+**Setup:**
+```typescript
+// Get free API token from https://huggingface.co/settings/tokens
+// No payment, totally free
+const HF_TOKEN = process.env.HUGGINGFACE_API_KEY;
+
+// Call Stable Diffusion via Hugging Face (free tier)
+const response = await fetch(
+  "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1",
+  {
+    headers: { Authorization: `Bearer ${HF_TOKEN}` },
+    method: "POST",
+    body: JSON.stringify({ inputs: "modern minimalist living room..." }),
+  }
+);
+```
+
+**Pros:**
+- ✅ **100% FREE** - No payment required
+- ✅ Very easy signup (just Hugging Face account)
+- ✅ Good quality for interior design
+- ✅ Can use Stable Diffusion models
+- ✅ No credit card needed
+
+**Cons:**
+- ⚠️ Slower (30-60s for free tier)
+- ⚠️ Limited concurrent requests (2)
+- ⚠️ Can be rate-limited during heavy usage
+- ⚠️ Queue times during peak hours
+
+**Cost:** **FREE** 🎉
+
+---
+
+### **ALTERNATIVE 2: Replicate API (FREE Tier + Paid)**
+
+**Setup:**
+```typescript
+import Replicate from "replicate";
+
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
+});
+
+// Free tier: 1 concurrent, 1 image per minute
+const output = await replicate.run(
+  "stability-ai/sdxl:a8453e0e-6f3b-4d6c-8a27-51b63cfaf5e9",
+  {
+    input: {
+      prompt: "modern minimalist living room...",
+      negative_prompt: "blurry, low quality",
+    },
+  }
+);
+```
+
+**Pros:**
+- ✅ Free tier available (generous for single user)
+- ✅ Higher quality than Hugging Face free
+- ✅ Easy integration (REST API)
+- ✅ Supports SDXL (better quality)
+- ✅ No setup needed, just API key
+
+**Cons:**
+- ⚠️ Free tier has limits (1 concurrent, can run ~30/month)
+- ⚠️ Paid after free credits ($0.000525 per image)
+- ⚠️ Requires credit card to sign up
+
+**Cost:** **FREE** (with limits) or ~$0.0005/image
+
+---
+
+### **RECOMMENDATION: FREE OPTION**
+
+#### **Best for Development/Testing: Hugging Face Inference API** ✅
+- Sign up: https://huggingface.co/join (completely free)
+- No credit card required
+- Perfect for prototyping
+- Good enough quality for moodboards
+
+#### **Best for Production: Replicate API (free tier)**
+- Sign up: https://replicate.com (requires credit card)
+- More reliable than Hugging Face free
+- Higher quality images
+- Cheap if you exceed free tier
+
+---
+
+### **COMPARISON: Which to Use?**
+
+| Use Case | Recommendation |
+|----------|-----------------|
+| **Want to test right now** | Hugging Face (instant, no CC) |
+| **Need better quality** | Replicate (free tier, needs CC) |
+| **Have lots of users** | DALL-E 3 ($0.08/image) |
+| **Want maximum control** | Stable Diffusion self-hosted |
+
+---
 
 ### **NOT RECOMMENDED: Midjourney**
 
@@ -191,13 +285,38 @@ Use if:
 
 ## ⚡ QUICK DECISION
 
-**Selected API:** **DALL-E 3** via OpenAI
-**Start Date:** Task 1.5.4
-**Expected Integration Time:** 4-6 hours
-**No additional infrastructure needed:** ✅
+**Current Implementation:** **DALL-E 3** via OpenAI
+**Cost:** ~$0.08 per image
+
+**For FREE Alternative:** Use **Hugging Face Inference API**
+- Sign up: https://huggingface.co/join (NO credit card needed)
+- Get API key
+- Replace in `moodboardImageGenerator.ts` with Hugging Face code
+
+**Free Alternative Benefits:**
+- ✅ Zero cost
+- ✅ Easy to set up (2 minutes)
+- ✅ Good enough quality for prototyping
+- ✅ Can switch to DALL-E later if needed
 
 ---
 
+## 🔧 How to Switch to Hugging Face (FREE)
+
+If you want to use the free option instead of DALL-E 3:
+
+1. **Sign up for free:** https://huggingface.co/join
+2. **Get API token:** Settings → Access Tokens → Create new token
+3. **Update `.env`:**
+   ```
+   HUGGINGFACE_API_KEY=hf_xxxxxxxxxxxxxxxxxxxxx
+   ```
+4. **Update `moodboardImageGenerator.ts`:**
+   ```typescript
+   // Replace the DALL-E 3 code with Hugging Face code
+   // (detailed implementation in HUGGING_FACE_INTEGRATION.md)
+   ```
+
 **Decision Maker:** AI Consultant Agent
-**Confidence Level:** 95%
-**Risk Level:** Very Low (can always add alternatives later)
+**Current Setup:** DALL-E 3 (can switch to free Hugging Face anytime)
+**Flexibility:** ✅ High (can add multiple image APIs, user can choose)

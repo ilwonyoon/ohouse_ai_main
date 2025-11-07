@@ -401,7 +401,7 @@ function detectIntentSignals(
   }
 
   // Apply image-based confidence boost if available
-  let finalConfidence = Math.min(
+  const finalConfidence = Math.min(
     0.95,
     baseConfidence + imageConfidenceBoost
   );

@@ -713,3 +713,100 @@ export interface EnhancedImageMetadata extends ImageMetadata {
   qualityScore?: number; // 0-100: How clear/useful is the image
   designReadiness?: "needs_work" | "functional" | "well_designed" | "designer_level";
 }
+
+// ===== STYLE QUIZ SCHEMA (Agent 1.4) =====
+/**
+ * Style quiz for learning user visual preferences
+ * "This or that" image pairing questions
+ */
+export interface StyleQuizImage {
+  id: string;
+  style: StyleCategory;
+  secondaryStyles?: StyleCategory[];
+  room_type?: string;
+  colors: string[];
+  description: string;
+  filename: string;
+  alt_text: string;
+}
+
+export interface StyleQuizQuestion {
+  id: string;
+  question: string;
+  description?: string;
+  imageA: StyleQuizImage;
+  imageB: StyleQuizImage;
+  category?: "overall" | "color" | "material" | "furniture" | "lighting" | "room_specific";
+  difficulty?: "easy" | "medium" | "hard";
+  weight?: number; // Default 1
+  room_type?: string; // If room-specific question
+}
+
+export interface StyleQuizResponse {
+  questionId: string;
+  chosenImageId: "imageA" | "imageB";
+  responseTime: number; // milliseconds
+  timestamp: Date;
+}
+
+export interface StyleQuizSession {
+  id: string;
+  userId: string;
+  startedAt: Date;
+  completedAt?: Date;
+  currentQuestionIndex: number;
+  totalQuestions: number;
+  responses: StyleQuizResponse[];
+  extractedMetadata?: Partial<ExtractedMetadata>;
+}
+
+export interface StylePreference {
+  style: StyleCategory;
+  score: number; // 0-100
+  confidence: number; // 0-1
+  percentage?: number;
+}
+
+export interface StyleQuizInsights {
+  colorPreference: "warm" | "cool" | "neutral" | "mixed";
+  colorBoldness: "neutral" | "bold" | "vibrant";
+  formality: "casual" | "balanced" | "formal";
+  patterns: "minimal" | "moderate" | "bold";
+  ornamentation: "minimal" | "moderate" | "ornate";
+  materials: {
+    natural: number;
+    synthetic: number;
+    mixed: number;
+  };
+}
+
+export interface StyleQuizResults {
+  sessionId: string;
+  userId: string;
+  completedAt: Date;
+
+  // Primary style
+  primaryStyle: StylePreference;
+
+  // All styles ranked
+  styleRanking: StylePreference[];
+
+  // Detailed insights
+  insights: StyleQuizInsights;
+
+  // Room-specific results
+  roomSpecificInsights?: Record<string, {
+    bestStyles: StyleCategory[];
+    avoidStyles: StyleCategory[];
+    recommendations: string[];
+  }>;
+
+  // Generated description
+  profile: string;
+
+  // Follow-up questions
+  followUpQuestions?: string[];
+
+  // Extracted metadata for consultation context
+  extractedMetadata: Partial<ExtractedMetadata>;
+}

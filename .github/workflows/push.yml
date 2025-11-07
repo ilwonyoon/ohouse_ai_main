@@ -9,12 +9,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - run: |
+          echo "📍 Current directory: $(pwd)"
+          echo "📁 Directory contents:"
+          ls -la
+          echo ""
+          echo "🔍 Looking for test file:"
+          find . -name "test_agent_14.js" -type f
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
+
       - run: npm ci
+
       - run: |
-          cd ${{ github.workspace }}
-          node test_agent_14.js || true
-      - run: echo "✅ Workflow completed"
+          echo "✅ Starting tests..."
+          if [ -f "test_agent_14.js" ]; then
+            node test_agent_14.js
+          else
+            echo "❌ test_agent_14.js not found!"
+            exit 1
+          fi

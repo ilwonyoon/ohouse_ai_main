@@ -380,3 +380,336 @@ export interface ContextFormResponse {
   completedSections: string[];
   extractedMetadata: Partial<ExtractedMetadata>;
 }
+
+// ===== IMAGE ANALYSIS SCHEMA (Agent 1.3) =====
+/**
+ * Complete image analysis result from vision API
+ * Comprehensive visual metadata extracted from room image
+ */
+export interface ImageAnalysisResult {
+  id: string;
+  userId: string;
+  uploadedAt: Date;
+  processedAt: Date;
+
+  // Image metadata
+  imageUrl?: string;
+  imageHash?: string; // For deduplication
+  imageSize: {
+    width: number;
+    height: number;
+  };
+
+  // Primary analysis results
+  roomAnalysis: RoomAnalysis;
+  visualAnalysis: VisualAnalysis;
+  styleAnalysis: StyleAnalysis;
+  issueAnalysis: IssueAnalysis;
+
+  // Confidence & metadata
+  confidence: number; // 0-1 overall confidence
+  processingTime: number; // milliseconds
+  analysisModel: string; // "claude-3-5-sonnet", "gpt-4-vision", etc.
+
+  // Raw response for debugging
+  rawAnalysis?: string;
+
+  // Extracted metadata for integration
+  extractedMetadata: Partial<ExtractedMetadata>;
+}
+
+/**
+ * Room identification and basic characteristics
+ */
+export interface RoomAnalysis {
+  // Primary room type
+  roomType: RoomType;
+  confidence: number; // Confidence in room type detection
+
+  // Alternative room types (in case of ambiguity)
+  alternativeTypes?: RoomType[];
+
+  // Estimated dimensions
+  estimatedSize: {
+    category: "small" | "medium" | "large"; // Visual assessment
+    estimatedSqFt?: number; // If detectable
+    description: string; // "Compact studio apartment" etc.
+  };
+
+  // Space characteristics
+  characteristics: {
+    openLayout: boolean;
+    multiLevel: boolean;
+    hasWindows: number; // Count of visible windows
+    hasNaturalLight: "poor" | "moderate" | "excellent";
+    ceilingHeight: "low" | "standard" | "high" | "cathedral";
+    wallCondition: "pristine" | "good" | "fair" | "poor";
+  };
+
+  // Architectural features
+  features: {
+    fireplaces?: number;
+    builtin_shelving?: boolean;
+    archways?: number;
+    columns?: number;
+    sloped_ceilings?: boolean;
+    exposed_beams?: boolean;
+    unusual_angles?: boolean;
+    other?: string[];
+  };
+}
+
+export type RoomType =
+  | "living_room"
+  | "bedroom"
+  | "kitchen"
+  | "bathroom"
+  | "dining_room"
+  | "home_office"
+  | "entryway"
+  | "hallway"
+  | "laundry_room"
+  | "garage"
+  | "nursery"
+  | "home_gym"
+  | "studio"
+  | "other";
+
+/**
+ * Visual characteristics: colors, lighting, textures
+ */
+export interface VisualAnalysis {
+  // Dominant colors
+  colorPalette: {
+    dominant: ColorInfo[];
+    secondary: ColorInfo[];
+    accents: ColorInfo[];
+  };
+
+  // Lighting assessment
+  lighting: {
+    naturalLight: "poor" | "moderate" | "excellent";
+    artificialLight: LightingType[];
+    overallBrightness: "dim" | "moderate" | "bright";
+    shadowPatterns: string; // "strong shadows", "even distribution", etc.
+    timeOfDay: "morning" | "midday" | "evening" | "night" | "unknown";
+  };
+
+  // Surface materials visible
+  materials: {
+    flooring: FlooringType[];
+    walls: WallType[];
+    ceiling: CeilingType[];
+    furniture_materials?: MaterialType[];
+  };
+
+  // Texture and finish
+  textureProfile: {
+    glossy: boolean;
+    matte: boolean;
+    smooth: boolean;
+    textured: boolean;
+    wood_grain: boolean;
+    patterns: string[]; // "stripes", "geometric", "floral", etc.
+  };
+}
+
+export interface ColorInfo {
+  name: string; // "sage green", "warm white", etc.
+  hex: string; // "#2D5016"
+  rgb?: { r: number; g: number; b: number };
+  percentageOfVisible: number; // 0-100
+  location?: string; // "walls", "furniture", "accents", etc.
+}
+
+export type LightingType =
+  | "recessed_lights"
+  | "pendant_lights"
+  | "track_lighting"
+  | "floor_lamp"
+  | "table_lamp"
+  | "chandelier"
+  | "wall_sconce"
+  | "natural_light"
+  | "string_lights"
+  | "other";
+
+export type FlooringType =
+  | "hardwood"
+  | "laminate"
+  | "vinyl"
+  | "carpet"
+  | "tile"
+  | "concrete"
+  | "stone"
+  | "area_rug"
+  | "mixed";
+
+export type WallType =
+  | "painted"
+  | "wallpaper"
+  | "shiplap"
+  | "exposed_brick"
+  | "concrete"
+  | "wood_paneling"
+  | "tile"
+  | "stone";
+
+export type CeilingType =
+  | "drywall"
+  | "popcorn"
+  | "tin"
+  | "wooden_beams"
+  | "cathedral"
+  | "tray";
+
+export type MaterialType =
+  | "wood"
+  | "metal"
+  | "upholstered"
+  | "leather"
+  | "glass"
+  | "plastic"
+  | "stone"
+  | "concrete"
+  | "fabric";
+
+/**
+ * Style indicators and design direction
+ */
+export interface StyleAnalysis {
+  // Primary style detected
+  primaryStyle: StyleCategory;
+  confidence: number;
+
+  // Supporting styles
+  secondaryStyles: StyleCategory[];
+
+  // Style characteristics
+  characteristics: {
+    formality: "casual" | "formal" | "mixed";
+    eclecticism: "minimalist" | "moderate" | "eclectic";
+    era: string; // "1980s-inspired", "contemporary", "timeless", etc.
+    mood: string[]; // "cozy", "energetic", "sophisticated", etc.
+  };
+
+  // Design elements observed
+  designElements: {
+    decorativeObjects: number;
+    artwork: number;
+    plants: number;
+    mirrors: number;
+    textiles: number;
+    patterns: boolean;
+    symmetry: "symmetric" | "asymmetric" | "mixed";
+  };
+
+  // Trends observed
+  trendIndicators: string[]; // "minimalism", "sustainable", "vintage", etc.
+}
+
+export type StyleCategory =
+  | "modern"
+  | "contemporary"
+  | "traditional"
+  | "transitional"
+  | "rustic"
+  | "farmhouse"
+  | "scandinavian"
+  | "industrial"
+  | "bohemian"
+  | "eclectic"
+  | "minimalist"
+  | "maximalist"
+  | "mid_century_modern"
+  | "victorian"
+  | "coastal"
+  | "southwest"
+  | "asian_inspired"
+  | "art_deco"
+  | "glam"
+  | "gothic"
+  | "other";
+
+/**
+ * Design issues and improvement opportunities
+ */
+export interface IssueAnalysis {
+  // Current issues identified
+  visibleIssues: {
+    issue: string;
+    severity: "minor" | "moderate" | "major";
+    category: IssueCategoryType;
+    description: string;
+  }[];
+
+  // Opportunities
+  opportunities: {
+    opportunity: string;
+    priority: "high" | "medium" | "low";
+    category: OpportunityCategoryType;
+    estimatedImpact: string; // "high", "medium", "low"
+  }[];
+
+  // Quick wins (easy improvements)
+  quickWins: string[];
+
+  // Challenges & constraints
+  challenges: {
+    challenge: string;
+    description: string;
+    severity: "minor" | "moderate" | "major";
+  }[];
+
+  // Overall assessment
+  assessment: {
+    clutterLevel: "low" | "moderate" | "high";
+    organizationLevel: "organized" | "somewhat_organized" | "disorganized";
+    lightingAdequacy: "insufficient" | "adequate" | "excellent";
+    functionalityGaps: string[];
+    designCoherence: "cohesive" | "somewhat_cohesive" | "fragmented";
+  };
+}
+
+export type IssueCategoryType =
+  | "lighting"
+  | "clutter"
+  | "color_clash"
+  | "poor_condition"
+  | "dated_style"
+  | "space_utilization"
+  | "storage"
+  | "traffic_flow"
+  | "proportion"
+  | "functionality";
+
+export type OpportunityCategoryType =
+  | "color_refresh"
+  | "lighting_upgrade"
+  | "furniture_replacement"
+  | "storage_solution"
+  | "art_decor"
+  | "accent_pieces"
+  | "flooring"
+  | "wall_treatment"
+  | "window_treatment"
+  | "style_cohesion"
+  | "functionality";
+
+/**
+ * Aggregated visual metadata
+ * Extends the existing ImageMetadata interface
+ */
+export interface EnhancedImageMetadata extends ImageMetadata {
+  // From ImageMetadata (already exists):
+  // room_type, color_palette, lighting_level, clutter_level, estimated_size
+  // visible_issues, furniture_count, style_indicators
+
+  // Additional analysis
+  imageAnalysisId?: string;
+  dominantColorHex?: string;
+  colorTemperature?: "warm" | "cool" | "neutral";
+  primaryStyle?: StyleCategory;
+  qualityScore?: number; // 0-100: How clear/useful is the image
+  designReadiness?: "needs_work" | "functional" | "well_designed" | "designer_level";
+}

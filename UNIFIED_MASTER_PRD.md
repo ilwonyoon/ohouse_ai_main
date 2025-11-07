@@ -389,6 +389,49 @@ Collect user intent, context preferences, and visual references to build compreh
 
 ---
 
+## 📊 GANTT CHART: Phase 1B Implementation Timeline
+
+```
+PHASE 1B PROGRESS (Week 1-4 of ~4 weeks total)
+
+Week 1: Foundation & UI Setup
+████████████████░░░░░░░░░░░░░░░░░░░░ 40%
+├─ Agent 1.1: IntentClassifier ✅ DONE (9h)
+├─ Task 2.D: UI Components ✅ DONE (12h)
+└─ LLM Core Setup ✅ DONE (16h)
+
+Week 2: Context Collection (Current Week)
+████████████████████░░░░░░░░░░░░░░░░░ 50%
+├─ Agent 1.2: ContextAgent ✅ DONE (17h)
+└─ Greeting & Message UX ✅ DONE (8h)
+
+Week 3-4: Image Analysis & Styling (Next)
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 0%
+├─ Agent 1.3: ImageAnalyzer (33h) 🎯 NEXT
+├─ Agent 1.4: StyleQuizAgent (27h)
+├─ Agent 1.5: VisionBuilderAgent (28h)
+└─ Agent 1.6: ScopeResolver (17h)
+
+Overall Phase 1B Progress
+████████████████████░░░░░░░░░░░░░░░░░ 33.5%
+(67 of 200 hours completed)
+```
+
+### Detailed Agent Timeline
+
+| Agent | Status | Hours | Progress | ETA |
+|-------|--------|-------|----------|-----|
+| 1.1: IntentClassifier v2 | ✅ Complete | 9 | ████████████████████ 100% | Done |
+| 1.2: ContextAgent | ✅ Complete | 17 | ████████████████████ 100% | Done |
+| 1.3: ImageAnalyzer | ⏳ Next | 33 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 3-4 |
+| 1.4: StyleQuizAgent | 🔄 Parallel | 27 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 3-4 |
+| 1.5: VisionBuilderAgent | 🔄 Parallel | 28 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 4 |
+| 1.6: ScopeResolver | 🔄 Parallel | 17 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 4 |
+| 2.A-C, 2.E-F: Frontend | ⏳ Later | 41 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 4+ |
+| **TOTAL** | | **200** | ████████████░░░░░░░░ 33.5% | 3.5 weeks |
+
+---
+
 ## 🔄 DEPENDENCY GRAPH
 
 ```

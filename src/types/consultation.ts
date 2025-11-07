@@ -324,3 +324,59 @@ export interface ConsultantResponse {
   suggestedAnswers?: string[];
   answerOptions?: AnswerOption[];
 }
+
+// ===== CONTEXT FORM SCHEMA (Agent 1.2) =====
+/**
+ * Form-based context collection for structured data gathering
+ * Alternative to open-ended conversation for faster context buildup
+ */
+export interface ContextFormField {
+  id: string;
+  label: string;
+  type: "text" | "number" | "checkbox" | "radio" | "select" | "range" | "date" | "textarea";
+  placeholder?: string;
+  description?: string;
+  required?: boolean;
+  optional?: boolean;
+  options?: Array<{
+    id: string;
+    label: string;
+    description?: string;
+  }>;
+  validation?: {
+    minLength?: number;
+    maxLength?: number;
+    pattern?: string;
+    customValidator?: (value: any) => boolean;
+  };
+  helpText?: string;
+}
+
+export interface ContextFormSection {
+  id: string;
+  title: string;
+  description: string;
+  icon?: string;
+  fields: ContextFormField[];
+  estimatedTime?: string; // "2 minutes", "5 minutes", etc.
+  optional?: boolean;
+}
+
+export interface ContextFormSchema {
+  id: string;
+  version: string;
+  title: string;
+  description: string;
+  sections: ContextFormSection[];
+  completionStrategy: "all_sections" | "adaptive" | "required_only";
+  estimatedTotalTime?: string;
+}
+
+export interface ContextFormResponse {
+  formId: string;
+  userId: string;
+  submittedAt: Date;
+  values: Record<string, any>;
+  completedSections: string[];
+  extractedMetadata: Partial<ExtractedMetadata>;
+}

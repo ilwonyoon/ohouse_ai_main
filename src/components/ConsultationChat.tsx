@@ -227,14 +227,9 @@ const streamingCursorStyle: React.CSSProperties = {
  */
 const DEFAULT_GREETING = `Hi! 👋 I'm your AI interior design consultant.
 
-Here's what we'll do together:
-1. **Learn about your space** - Room size, layout, natural light, current furniture
-2. **Understand your goals** - What look do you want? What problems are you solving?
-3. **Explore your lifestyle** - How do you live in this space? Entertaining? Kids? WFH?
-4. **Collect inspiration** - Colors, styles, materials you love
-5. **Build your brief** - A detailed design roadmap for professional designers
+I'm here to learn about your space, what you're hoping to achieve, and any constraints we should keep in mind so we can craft the perfect plan together.
 
-**Let's start!** Tell me about the space you'd like to transform. 🏠`;
+Whenever you're ready, tell me about the space you'd like to transform. 🏠`;
 
 export interface ConsultationChatProps {
   userId: string;
@@ -286,28 +281,37 @@ export function ConsultationChat({
 
   // Initialize consultation on first render
   useEffect(() => {
-    if (!isInitialized) {
-      console.log("🟢 Initializing consultation...", { context: !!context, messagesCount: context?.messages.length });
+    // Skip if already initialized
+    if (isInitialized) return;
 
-      // Check if we need to create a new consultation
-      const needsInitialization = !context || context.messages.length === 0;
+    // Check if context has a greeting message already
+    const hasGreetingMessage = context?.messages?.some(
+      msg => msg.role === "assistant" && msg.content.includes("I'm your AI")
+    );
 
-      if (needsInitialization) {
-        console.log("🟡 Creating new consultation and adding greeting...");
-        const newContext = initializeConsultation(userId);
-        if (newContext) {
-          console.log("🟢 Context created, now adding greeting message...");
-          // The addMessage call will trigger a state update
-          addMessage("assistant", initialMessage);
-          setIsInitialized(true);
-        }
-      } else {
-        // Context exists with messages, just mark as initialized
-        console.log("🔵 Context exists with messages, resuming...");
-        setIsInitialized(true);
-      }
+    console.log("🟢 Initializing consultation...", {
+      contextExists: !!context,
+      messageCount: context?.messages.length ?? 0,
+      hasGreeting: hasGreetingMessage
+    });
+
+    // If context exists and has a greeting, just mark initialized
+    if (context && hasGreetingMessage) {
+      console.log("✅ Greeting message already exists, marking initialized");
+      setIsInitialized(true);
+      return;
     }
-  }, [context, isInitialized, initializeConsultation, userId, initialMessage, addMessage]);
+
+    // If context doesn't exist or has no messages, create new one with greeting
+    if (!context || context.messages.length === 0) {
+      console.log("🟡 Creating new consultation with greeting message...");
+      const newContext = initializeConsultation(userId, initialMessage);
+      console.log("🟢 Context created with greeting message:", {
+        messagesCount: newContext?.messages.length
+      });
+      setIsInitialized(true);
+    }
+  }, []); // Empty dependency array - run only on mount
 
   // Auto-scroll to latest message
   useEffect(() => {

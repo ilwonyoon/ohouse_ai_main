@@ -1,12 +1,13 @@
 # 🏗️ UNIFIED MASTER PRD: AI Interior Design Agent System
 ## Complete Implementation Roadmap with Clear Numbering
 
-**Document Version:** 2.0 (UNIFIED)
-**Date:** 2025-11-06
+**Document Version:** 2.1 (UNIFIED - SINGLE SOURCE OF TRUTH)
+**Date:** 2025-11-07
 **Author:** Ilwon Yoon
-**Status:** ACTIVE - Ready for Implementation
+**Status:** ACTIVE - Phase 1B In Progress
 **Total Estimated Effort:** 20-26 weeks | ~14,000 LOC
-**Current System Completion:** 20% (~2,800 LOC implemented)
+**Current System Completion:** 25% (~3,500 LOC implemented)
+**Note:** This is the ONLY PRD document for the project. All progress tracked here exclusively.
 
 ---
 
@@ -20,8 +21,10 @@ This is the **SINGLE SOURCE OF TRUTH** for the AI Interior Design Agent System i
 - **Task N.M.K**: Specific implementation tasks within each agent
 
 ### Current Status
-- ✅ **Phase 1 (Part A)**: Consultation Engine - **COMPLETE** (4,253238 commit)
-- 🟨 **Phase 1 (Part B)**: Planning Layer Completion - **IN PROGRESS** (27 hours done, 160 hours remaining)
+- ✅ **Phase 1 (Part A)**: Consultation Engine - **COMPLETE** (4253238 commit)
+- 🟨 **Phase 1 (Part B)**: Planning Layer Completion - **IN PROGRESS** (50+ hours done, 150 hours remaining)
+  - Core LLM integration & UI complete
+  - Next: Agent 1.2 (ContextAgent) - Form-based context collection
 - ⏳ **Phase 2-6**: Design through E-Commerce - **NOT STARTED**
 
 ---
@@ -343,20 +346,34 @@ Collect user intent, context preferences, and visual references to build compreh
 
 ## 📊 PHASE 1B: CURRENT PROGRESS
 
-### Completed (27 hours)
-- ✅ Agent 1.1: IntentClassifier v2 (9 hours)
-- ✅ Task 2.D: UI Components (12 hours)
-- ✅ Planning & Documentation (6 hours)
+### Completed (50+ hours)
+- ✅ Agent 1.1: IntentClassifier v2 (9 hours) - Commit: 853fadb
+- ✅ Task 2.D: UI Components (12 hours) - Commit: f19d403
+- ✅ Consultation Engine Foundation (15 hours) - Commit: 4253238
+- ✅ LLM Integration & Core Components (16 hours) - Commits: 821f6b0, e7193c9
+  - ConsultationChat component with streaming support
+  - useConsultationState hook with Jotai state management
+  - Message persistence and staggered display
+  - Greeting message system (Codex fixes)
+  - Metadata panel integration
+  - Token counter display
 
-### Remaining (160 hours)
+### Recent Fixes by Codex (Session Nov 7)
+- ✅ Fixed disappearing chat bubble bug - messages now persist correctly
+- ✅ Tweaked greeting message - clearer, more concise language
+- ✅ Fixed Emotion CSS-in-JS pragma issues in multiple components
+- ✅ Fixed route accessibility at /ai-consultation
+
+### Remaining (150 hours)
 - ⏳ Agent 1.2: ContextAgent (17 hours)
 - ⏳ Agent 1.3: ImageAnalyzer (33 hours)
 - ⏳ Agent 1.4: StyleQuizAgent (27 hours)
 - ⏳ Agent 1.5: VisionBuilderAgent (28 hours)
 - ⏳ Agent 1.6: ScopeResolver (17 hours)
-- ⏳ Task 2.A-C, 2.E-F: Frontend (41 hours)
+- ⏳ Task 2.A-C, 2.E-F: Frontend & Integration (41 hours)
 
-**Timeline:** 4 weeks at current pace
+**Timeline:** 4 weeks remaining at current pace
+**Critical Next Step:** Agent 1.2 - ContextAgent for form-based context collection
 
 ---
 

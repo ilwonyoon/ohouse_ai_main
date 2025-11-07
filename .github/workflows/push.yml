@@ -12,5 +12,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
       - run: npm ci
-      - run: node test_agent_14.js || true
+      - run: |
+          cd ${{ github.workspace }}
+          node test_agent_14.js || true
+      - run: echo "✅ Workflow completed"

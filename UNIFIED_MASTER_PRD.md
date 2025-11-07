@@ -6,7 +6,7 @@
 **Author:** Ilwon Yoon
 **Status:** ACTIVE - Phase 1B In Progress
 **Total Estimated Effort:** 20-26 weeks | ~14,000 LOC
-**Current System Completion:** 48% (~6,730 LOC implemented - Agent 1.4 added 2,180)
+**Current System Completion:** 52% (~7,300 LOC implemented - Agent 1.5 added 570 LOC)
 **Note:** This is the ONLY PRD document for the project. All progress tracked here exclusively.
 
 ---
@@ -26,8 +26,8 @@ This is the **SINGLE SOURCE OF TRUTH** for the AI Interior Design Agent System i
   - ✅ Agent 1.1: IntentClassifier v2 (9 hours)
   - ✅ Agent 1.2: ContextAgent (17 hours)
   - ✅ Agent 1.3: ImageAnalyzer (33 hours)
-  - ✅ Agent 1.4: StyleQuizAgent (27 hours) ⭐ JUST COMPLETED
-  - ⏳ Agent 1.5: VisionBuilderAgent (28 hours) - NEXT
+  - ✅ Agent 1.4: StyleQuizAgent (27 hours)
+  - ✅ Agent 1.5: VisionBuilderAgent (28 hours) ⭐ JUST COMPLETED
   - ⏳ Agent 1.6: ScopeResolver enhancement (17 hours remaining)
 - ⏳ **Phase 2-6**: Design through E-Commerce - **NOT STARTED**
 
@@ -492,11 +492,11 @@ Overall Phase 1B Progress
 | 1.1: IntentClassifier v2 | ✅ Complete | 9 | ████████████████████ 100% | Done |
 | 1.2: ContextAgent | ✅ Complete | 17 | ████████████████████ 100% | Done |
 | 1.3: ImageAnalyzer | ✅ Complete | 33 | ████████████████████ 100% | Done |
-| 1.4: StyleQuizAgent | ✅ Complete | 27 | ████████████████████ 100% | Done ⭐ |
-| 1.5: VisionBuilderAgent | 🎯 Next | 28 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 3 |
-| 1.6: ScopeResolver | ⏳ Next | 17 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 3 |
-| 2.A-C, 2.E-F: Frontend | ⏳ Later | 35 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 4 |
-| **TOTAL** | | **200** | ████████████████░░░░ 60% | 2 weeks |
+| 1.4: StyleQuizAgent | ✅ Complete | 27 | ████████████████████ 100% | Done |
+| 1.5: VisionBuilderAgent | ✅ Complete | 28 | ████████████████████ 100% | Done ⭐ |
+| 1.6: ScopeResolver | 🎯 Next | 17 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 4 |
+| 2.A-C, 2.E-F: Frontend | ⏳ Later | 35 | ░░░░░░░░░░░░░░░░░░░░ 0% | Week 4-5 |
+| **TOTAL** | | **200** | ███████████████████░░ 70% | 2-3 weeks |
 
 ---
 

@@ -186,6 +186,16 @@ const headerStyle = css`
 
 // ===== COMPONENT =====
 
+/**
+ * Default greeting message for consultation
+ * Sets expectations and context for the conversation
+ */
+const DEFAULT_GREETING = `Hi! 👋 I'm your AI interior design consultant.
+
+I'm here to learn about your space, what you're hoping to achieve, and any constraints we should keep in mind so we can craft the perfect plan together.
+
+Whenever you're ready, tell me about the space you'd like to transform. 🏠`;
+
 export interface ConsultationChatProps {
   userId: string;
   onBriefGenerated?: (brief: any) => void;
@@ -195,7 +205,7 @@ export interface ConsultationChatProps {
 export function ConsultationChat({
   userId,
   onBriefGenerated,
-  initialMessage = "Hi! Welcome! I'm here to help you create a space you'll love.\n\nWhat brings you here today?",
+  initialMessage = DEFAULT_GREETING,
 }: ConsultationChatProps) {
   const {
     context,
@@ -219,31 +229,18 @@ export function ConsultationChat({
   const [inputValue, setInputValue] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const initRef = useRef(false);
 
   // Initialize consultation on mount
   useEffect(() => {
-    // Only run once
-    if (initRef.current) return;
-    initRef.current = true;
-
-    // Step 1: Create context if it doesn't exist
-    if (!context) {
-      console.log("Creating new consultation context...");
-      initializeConsultation(userId);
-    }
-  }, []);
-
-  // Add greeting message when context is ready
-  useEffect(() => {
-    if (!context) return;
-    if (context.messages.length > 0) return;
     if (isInitialized) return;
 
-    console.log("Adding greeting message...");
-    addMessage("assistant", initialMessage);
+    if (!context || context.messages.length === 0) {
+      console.log("Initializing consultation with greeting...");
+      initializeConsultation(userId, initialMessage);
+    }
+
     setIsInitialized(true);
-  }, [context, isInitialized, addMessage, initialMessage]);
+  }, [context, initializeConsultation, initialMessage, isInitialized, userId]);
 
   // Auto-scroll to latest message
   useEffect(() => {

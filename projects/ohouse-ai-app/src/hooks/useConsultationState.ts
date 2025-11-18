@@ -131,14 +131,25 @@ export function useConsultationState() {
   const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
   const [error, setError] = useAtom(errorAtom);
 
-  // Initialize new consultation
-  const initializeConsultation = (userId: string) => {
+  // Initialize new consultation with optional greeting message
+  const initializeConsultation = (userId: string, greetingMessage?: string) => {
+    const initialMessages: ConsultationMessage[] = [];
+
+    if (greetingMessage) {
+      initialMessages.push({
+        id: `msg_${Date.now()}`,
+        role: "assistant",
+        content: greetingMessage,
+        timestamp: new Date(),
+      });
+    }
+
     const newContext: ConsultationContext = {
       id: `consultation_${Date.now()}`,
       userId,
       createdAt: new Date(),
       updatedAt: new Date(),
-      messages: [],
+      messages: initialMessages,
       phase: "intent_detection",
       userType: "exploratory",
       metadata: {
@@ -158,9 +169,7 @@ export function useConsultationState() {
     content: string,
     extractedMetadata?: ExtractedMetadata
   ) => {
-    if (!context) return;
-
-    const newMessage: ConsultationMessage = {
+    const message: ConsultationMessage = {
       id: `msg_${Date.now()}`,
       role,
       content,
@@ -168,84 +177,112 @@ export function useConsultationState() {
       extractedMetadata,
     };
 
-    const updatedMessages = [...messages, newMessage];
-    const updatedContext: ConsultationContext = {
-      ...context,
-      messages: updatedMessages,
-      metadata: extractedMetadata || context.metadata,
-      updatedAt: new Date(),
-    };
+    let didUpdate = false;
 
-    setContext(updatedContext);
-    return newMessage;
+    setContext((prevContext) => {
+      if (!prevContext) {
+        return prevContext;
+      }
+
+      didUpdate = true;
+
+      return {
+        ...prevContext,
+        messages: [...prevContext.messages, message],
+        metadata: extractedMetadata || prevContext.metadata,
+        updatedAt: new Date(),
+      };
+    });
+
+    return didUpdate ? message : undefined;
   };
 
   // Update consultation phase
   const updatePhase = (newPhase: ConsultationPhase) => {
-    if (!context) return;
-    const updatedContext: ConsultationContext = {
-      ...context,
-      phase: newPhase,
-      updatedAt: new Date(),
-    };
-    setContext(updatedContext);
+    setContext((prevContext) => {
+      if (!prevContext) {
+        return prevContext;
+      }
+
+      return {
+        ...prevContext,
+        phase: newPhase,
+        updatedAt: new Date(),
+      };
+    });
   };
 
   // Update user type based on intent detection
   const updateUserType = (newType: ProjectScopeType) => {
-    if (!context) return;
-    const updatedContext: ConsultationContext = {
-      ...context,
-      userType: newType,
-      updatedAt: new Date(),
-    };
-    setContext(updatedContext);
+    setContext((prevContext) => {
+      if (!prevContext) {
+        return prevContext;
+      }
+
+      return {
+        ...prevContext,
+        userType: newType,
+        updatedAt: new Date(),
+      };
+    });
   };
 
   // Update completion status
   const updateCompletionStatus = (
     status: ConsultationContext["completionStatus"]
   ) => {
-    if (!context) return;
-    const updatedContext: ConsultationContext = {
-      ...context,
-      completionStatus: status,
-      updatedAt: new Date(),
-    };
-    setContext(updatedContext);
+    setContext((prevContext) => {
+      if (!prevContext) {
+        return prevContext;
+      }
+
+      return {
+        ...prevContext,
+        completionStatus: status,
+        updatedAt: new Date(),
+      };
+    });
   };
 
   // Update metadata with extracted information
   const mergeMetadata = (newMetadata: Partial<ExtractedMetadata>) => {
-    if (!context) return;
-    const mergedMetadata: ExtractedMetadata = {
-      ...context.metadata,
-      ...newMetadata,
-      rawKeywords: [
-        ...new Set([
-          ...context.metadata.rawKeywords,
-          ...(newMetadata.rawKeywords || []),
-        ]),
-      ],
-    };
+    setContext((prevContext) => {
+      if (!prevContext) {
+        return prevContext;
+      }
 
-    const updatedContext: ConsultationContext = {
-      ...context,
-      metadata: mergedMetadata,
-      updatedAt: new Date(),
-    };
-    setContext(updatedContext);
+      const mergedMetadata: ExtractedMetadata = {
+        ...prevContext.metadata,
+        ...newMetadata,
+        rawKeywords: [
+          ...new Set([
+            ...prevContext.metadata.rawKeywords,
+            ...(newMetadata.rawKeywords || []),
+          ]),
+        ],
+      };
+
+      return {
+        ...prevContext,
+        metadata: mergedMetadata,
+        updatedAt: new Date(),
+      };
+    });
   };
 
   // Update quality score
   const updateQualityScore = (score: number) => {
-    if (!context) return;
-    const updatedContext: ConsultationContext = {
-      ...context,
-      conversationQualityScore: Math.min(Math.max(score, 0), 1),
-      updatedAt: new Date(),
-    };
-    setContext(updatedContext);
+    setContext((prevContext) => {
+      if (!prevContext) {
+        return prevContext;
+      }
+
+      return {
+        ...prevContext,
+        conversationQualityScore: Math.min(Math.max(score, 0), 1),
+        updatedAt: new Date(),
+      };
+    });
   };
 
   // Clear consultation
